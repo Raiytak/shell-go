@@ -20,6 +20,6 @@ func main() {
    }
 
    // if command not found
-   fmt.Printf("%s command not found", text[:len(text)-1])
+   fmt.Printf("%s: command not found", text[:len(text)-1])
    os.Exit(1)
 }
