@@ -18,10 +18,9 @@ func main() {
     fmt.Print("$ ")
     text, err := reader.ReadString('\n')
     if err != nil {
-      fmt.Print("Error happened with the input")
+      fmt.Print("Error happened with the input\n")
       os.Exit(1)
     }
-    fmt.Printf("%s: command not found", text[:len(text)-1])
-    os.Exit(1)
+    fmt.Printf("%s: command not found\n", text[:len(text)-1])
   }
 }
