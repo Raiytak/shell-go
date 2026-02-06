@@ -4,7 +4,6 @@ import (
 	"fmt"
   "os"
   "bufio"
-  "slices"
 )
 
 // Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
@@ -12,7 +11,6 @@ var _ = fmt.Print
 
 func main() {
   reader := bufio.NewReader(os.Stdin)
-  functions := []string{"exit"}
 
    // if command not found
   for {
@@ -23,11 +21,14 @@ func main() {
       fmt.Print("Error happened with the input\n")
       os.Exit(1)
     }
-    if !(slices.Contains(functions, text)) {
-      fmt.Printf("%s: command not found\n", text)
-    }
+
+    // Exit
     if (text == "exit") {
       os.Exit(0)
+    } else if (text[:4] == "echo") {
+      fmt.Print(text[5:], "\n")
+    } else {
+      fmt.Printf("%s: command not found\n", text)
     }
   }
 }
