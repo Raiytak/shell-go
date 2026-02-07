@@ -77,7 +77,8 @@ func RunCommand(cmd string, args []string, pathList []string) {
   // Command executable
   cmdPath, isExec := FindInPath(cmd, pathList)
   if isExec {
-    e_cmd := exec.Command(cmdPath, args...)
+    e_cmd := exec.Command(cmd, args...)
+    e_cmd.Path = cmdPath
     e_cmd.Stdout = os.Stdout
     e_cmd.Stderr = os.Stderr
     err := e_cmd.Run()
