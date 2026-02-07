@@ -11,24 +11,27 @@ var builtinCommands = []string{
   "echo",
   "exit",
   "type",
+  "pwd",
 }
 
-func echoCmd(args []string, _ []string) {
+// Builtin command
+func echoCmd(args []string) {
   fmt.Println(joinArgs(args))
 }
 
-func exitCmd(_ []string, _ []string) {
+func exitCmd() {
   os.Exit(0)
 
 }
 
-func typeCmd(args []string, pathList []string) {
+func typeCmd(s *Shell, args []string) {
   if len(args) == 0 {
     fmt.Println(": not found")
     return
   }
 
   cmd := args[0]
+  pathList := s.pathList
 
   // Built-in Function
   if ok := slices.Contains(builtinCommands, cmd); ok {
@@ -46,6 +49,11 @@ func typeCmd(args []string, pathList []string) {
   fmt.Printf("%s: not found\n", cmd)
 }
 
+func pwdCmd(s *Shell, args []string) {
+  fmt.Printf("%s\n", s.wDir)
+}
+
+// Other functions
 func joinArgs(args []string) string {
   if len(args) == 0 {
     return ""
@@ -58,16 +66,18 @@ func joinArgs(args []string) string {
   return result
 }
 
-func RunCommand(cmd string, args []string, pathList []string) {
+func RunCommand(s *Shell, cmd string, args []string) {
   // Builtin command
   if ok := slices.Contains(builtinCommands, cmd); ok {
     switch cmd {
     case "exit":
-      exitCmd(args, pathList)
+      exitCmd()
     case "type":
-      typeCmd(args, pathList)
+      typeCmd(s, args)
     case "echo":
-      echoCmd(args, pathList)
+      echoCmd(args)
+    case "pwd":
+      pwdCmd(s, args)
     default:
       fmt.Printf("%s: command not found\n", cmd)
     }
@@ -75,7 +85,7 @@ func RunCommand(cmd string, args []string, pathList []string) {
   }
 
   // Command executable
-  cmdPath, isExec := FindInPath(cmd, pathList)
+  cmdPath, isExec := FindInPath(cmd, s.pathList)
   if isExec {
     e_cmd := exec.Command(cmd, args...)
     e_cmd.Path = cmdPath
