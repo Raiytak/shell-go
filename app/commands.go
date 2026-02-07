@@ -5,6 +5,8 @@ import (
   "os"
   "slices"
   "os/exec"
+  "strings"
+  "path"
 )
 
 var builtinCommands = []string{
@@ -12,11 +14,12 @@ var builtinCommands = []string{
   "exit",
   "type",
   "pwd",
+  "cd",
 }
 
 // Builtin command
-func echoCmd(args []string) {
-  fmt.Println(joinArgs(args))
+func echoCmd(args string) {
+  fmt.Println(args)
 }
 
 func exitCmd() {
@@ -24,13 +27,14 @@ func exitCmd() {
 
 }
 
-func typeCmd(s *Shell, args []string) {
+func typeCmd(s *Shell, args string) {
   if len(args) == 0 {
     fmt.Println(": not found")
     return
   }
 
-  cmd := args[0]
+  s_args := strings.Fields(args)
+  cmd := s_args[0]
   pathList := s.pathList
 
   // Built-in Function
@@ -49,8 +53,35 @@ func typeCmd(s *Shell, args []string) {
   fmt.Printf("%s: not found\n", cmd)
 }
 
-func pwdCmd(s *Shell, args []string) {
+func pwdCmd(s *Shell, args string) {
+  fields := strings.Fields(args)
+  if len(fields) != 0 {
+    fmt.Print("pwd: too many arguments\n")
+    return
+  }
   fmt.Printf("%s\n", s.wDir)
+}
+
+func cdCmd(s *Shell, args string) {
+  fields := strings.Fields(args)
+  if len(fields) == 0 {
+    return
+  }
+
+  wDir := ""
+  if args[0] == '/' {
+    wDir = args
+  } else if args[0] == '~' {
+    wDir = os.Getenv("HOME") + args[1:]
+  } else {
+    wDir = path.Clean(path.Join(s.wDir, args))
+  }
+  _, err := os.Stat(wDir)
+  if err != nil {
+    fmt.Printf("cd: %s: No such file or directory\n", wDir)
+    return
+  }
+  s.wDir = wDir
 }
 
 // Other functions
@@ -66,7 +97,7 @@ func joinArgs(args []string) string {
   return result
 }
 
-func RunCommand(s *Shell, cmd string, args []string) {
+func RunCommand(s *Shell, cmd string, args string) {
   // Builtin command
   if ok := slices.Contains(builtinCommands, cmd); ok {
     switch cmd {
@@ -78,6 +109,8 @@ func RunCommand(s *Shell, cmd string, args []string) {
       echoCmd(args)
     case "pwd":
       pwdCmd(s, args)
+    case "cd":
+      cdCmd(s, args)
     default:
       fmt.Printf("%s: command not found\n", cmd)
     }
@@ -86,8 +119,9 @@ func RunCommand(s *Shell, cmd string, args []string) {
 
   // Command executable
   cmdPath, isExec := FindInPath(cmd, s.pathList)
+  fields := strings.Fields(args)
   if isExec {
-    e_cmd := exec.Command(cmd, args...)
+    e_cmd := exec.Command(cmd, fields...)
     e_cmd.Path = cmdPath
     e_cmd.Stdout = os.Stdout
     e_cmd.Stderr = os.Stderr

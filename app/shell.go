@@ -40,13 +40,16 @@ func (s *Shell) Run() {
 		}
 
 		line = strings.TrimLeft(line, " ")
+		line = strings.TrimRight(line, "\n")
 		if line == "" {
 			continue
 		}
 
-		fields := strings.Fields(line)
-		cmd := fields[0]
-		args := fields[1:]
+    trimmed_line := strings.TrimLeft(line, " \t")
+    cmd, args, found := strings.Cut(trimmed_line, " ")
+    if !found {
+      args = ""
+    }
 
 		RunCommand(s, cmd, args)
 	}
