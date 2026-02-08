@@ -7,19 +7,19 @@ import (
 	"strings"
 )
 
-func CdCmd(s Shell, args string) {
-	fields := strings.Fields(args)
-	if len(fields) == 0 {
+func CdCmd(s Shell, args []string) {
+  dir := strings.Join(args, "/")
+	if len(dir) == 0 {
 		return
 	}
 
 	wDir := ""
-	if args[0] == '/' {
-		wDir = args
-	} else if args[0] == '~' {
-		wDir = os.Getenv("HOME") + args[1:]
+	if dir[0] == '/' {
+		wDir = dir
+	} else if dir[0] == '~' {
+		wDir = os.Getenv("HOME") + dir[1:]
 	} else {
-		wDir = path.Clean(path.Join(s.WorkingDir(), args))
+		wDir = path.Clean(path.Join(s.WorkingDir(), dir))
 	}
 	_, err := os.Stat(wDir)
 	if err != nil {

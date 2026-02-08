@@ -47,10 +47,8 @@ func (s *Shell) Run() {
 		}
 
 		trimmed_line := strings.TrimLeft(line, " \t")
-		cmd, args, found := strings.Cut(trimmed_line, " ")
-		if !found {
-			args = ""
-		}
+		cmd, str_args, _ := strings.Cut(trimmed_line, " ")
+    args := strings.Fields(str_args)
 
 		command.RunCommand(s, cmd, args)
 	}

@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"slices"
-	"strings"
 )
 
 type Shell interface {
@@ -27,7 +26,7 @@ func joinArgs(args []string) string {
 	return result
 }
 
-func RunCommand(s Shell, cmd string, args string) {
+func RunCommand(s Shell, cmd string, args []string) {
 	// Builtin command
 	if ok := slices.Contains(builtinCommands, cmd); ok {
 		switch cmd {
@@ -51,12 +50,11 @@ func RunCommand(s Shell, cmd string, args string) {
 	execCmd(s, cmd, args)
 }
 
-func execCmd(s Shell, cmd string, args ...string) {
+func execCmd(s Shell, cmd string, args []string) {
 	cmdPath, isExec := FindInPath(cmd, s.PathList())
-	params := strings.Fields(strings.Join(args, " "))
 
 	if isExec {
-		eCmd := exec.Command(cmd, params...)
+		eCmd := exec.Command(cmd, args...)
 		eCmd.Path = cmdPath
 		eCmd.Stdout = os.Stdout
 		eCmd.Stderr = os.Stderr

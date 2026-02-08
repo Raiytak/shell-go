@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 	"slices"
-	"strings"
 )
 
 var builtinCommands = []string{
@@ -14,14 +13,13 @@ var builtinCommands = []string{
 	"cd",
 }
 
-func TypeCmd(s Shell, args string) {
+func TypeCmd(s Shell, args []string) {
 	if len(args) == 0 {
 		fmt.Println(": not found")
 		return
 	}
 
-	s_args := strings.Fields(args)
-	cmd := s_args[0]
+	cmd := args[0]
 	pathList := s.PathList()
 
 	// Built-in Function

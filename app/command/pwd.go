@@ -2,12 +2,10 @@ package command
 
 import (
 	"fmt"
-	"strings"
 )
 
-func PwdCmd(s Shell, args string) {
-	fields := strings.Fields(args)
-	if len(fields) != 0 {
+func PwdCmd(s Shell, args []string) {
+	if len(args) != 0 {
 		fmt.Print("pwd: too many arguments\n")
 		return
 	}
