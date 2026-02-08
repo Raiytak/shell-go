@@ -56,11 +56,11 @@ func execCmd(s Shell, cmd string, args []string) {
 		eCmd := exec.Command(cmd, args...)
 		eCmd.Path = cmdPath
 		eCmd.Stdout = os.Stdout
-		//eCmd.Stderr = os.Stderr
+		eCmd.Stderr = os.Stderr
 		err := eCmd.Run()
-		if err != nil {
-			fmt.Printf("Command failed: %v\n", err)
-		}
+		/*if err != nil {
+      fmt.Printf("%s:  failed: %v\n", err)
+		}*/
 	} else {
 		fmt.Printf("%s: command not found\n", cmd)
 	}
