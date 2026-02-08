@@ -6,14 +6,16 @@ import (
 )
 
 func EchoCmd(args []string) {
-  firstChar, lastChar := args[0][0], args[len(args)][len(len(args))]
-  if firstChar == "'" || firstChar == "\"" {
+  firstString, lastString  := args[0], args[len(args)-1]
+  firstChar, lastChar := firstString[0], lastString[len(lastString)-1]
+
+  if firstChar == '"' || firstChar == '\'' {
     if firstChar != lastChar {
       fmt.Print("Unclosed string\n")
       return
     }
-    args[0] = args[0][1:]
-    args[len(args)] = args[len(args)][:len(args[len(args])]
+    args[0] = firstString[1:]
+    args[len(args)-1] = lastString[:len(lastString)-1]
   }
 	fmt.Println(strings.Join(args, " "))
 
