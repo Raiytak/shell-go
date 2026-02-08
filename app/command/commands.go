@@ -58,6 +58,9 @@ func execCmd(s Shell, cmd string, args []string) {
 		eCmd.Stdout = os.Stdout
 		eCmd.Stderr = os.Stderr
 		err := eCmd.Run()
+		if err != nil {
+      fmt.Print(err)
+		}
 	} else {
 		fmt.Printf("%s: command not found\n", cmd)
 	}
