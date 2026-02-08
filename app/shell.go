@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+  "slices"
   "github.com/codecrafters-io/shell-starter-go/app/command"
 )
 
@@ -31,27 +32,47 @@ func NewShell() *Shell {
 }
 
 func (s *Shell) Run() {
+  stdout := os.Stdout
 	for {
+    os.Stdout = stdout
 		fmt.Print("$ ")
 
-		line, err := s.reader.ReadString('\n')
-		if err != nil {
-			fmt.Print("input error")
-			return
-		}
+    cmd, args, err := processUserInput(s)
+    if err != nil {
+      fmt.Printf("error processing: %s %s", cmd, args)
+      continue
+    }
 
-		line = strings.TrimLeft(line, " ")
-		line = strings.TrimRight(line, "\n")
-		if line == "" {
-			continue
-		}
+    // Redirect output
+    if len(args) >= 2 && (args[len(args)-2] == ">" || args[len(args)-2] == "1>") {
+      file, err := os.Create(args[len(args) -1])
+      if err != nil {
+        fmt.Printf("error redirecting output: %s", err)
+        continue
+      }
+      defer file.Close()
 
-		trimmed_line := strings.TrimLeft(line, " \t")
-		cmd, str_args, _ := strings.Cut(trimmed_line, " ")
-    args := strings.Fields(str_args)
-
+      os.Stdout = file
+      args = slices.Delete(args, len(args)-2, len(args))
+      // args = args[:len(args)-2]
+      // eCmd.Stderr = os.Stderr
+    }
 		command.RunCommand(s, cmd, args)
-	}
+  }
+}
+
+func processUserInput(s *Shell) (cmd string, args []string, err error) {
+  line, err := s.reader.ReadString('\n')
+  if err != nil {
+    return
+  }
+
+  fields := strings.Fields(line)
+  cmd = fields[0]
+  if len(fields) > 1 {
+    args = fields[1:]
+  }
+  return
 }
 
 func (s *Shell) WorkingDir() string {

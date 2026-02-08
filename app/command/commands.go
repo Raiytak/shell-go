@@ -27,7 +27,6 @@ func joinArgs(args []string) string {
 }
 
 func RunCommand(s Shell, cmd string, args []string) {
-	// Builtin command
 	if ok := slices.Contains(builtinCommands, cmd); ok {
 		switch cmd {
 		case "exit":
