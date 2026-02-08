@@ -29,7 +29,7 @@ func TypeCmd(s Shell, args []string) {
 	}
 
 	// Function Found in PATH
-	cmdPath, isExec := FindInPath(cmd, pathList)
+	cmdPath, isExec := CmdPath(cmd, pathList)
 	if isExec {
 		fmt.Printf("%s is %s\n", cmd, cmdPath)
 		return

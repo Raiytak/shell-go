@@ -27,7 +27,21 @@ func joinArgs(args []string) string {
 }
 
 func RunCommand(s Shell, cmd string, args []string) {
-	if ok := slices.Contains(builtinCommands, cmd); ok {
+	if isBuiltin(cmd) {
+    execBuiltinCmd(s, cmd, args)
+		return
+  } else if cmdPath, ok := CmdPath(cmd, s.PathList()); ok {
+    execCmd(s, cmd, cmdPath,args)
+  } else {
+		fmt.Printf("%s: command not found\n", cmd)
+  }
+}
+
+func isBuiltin(cmd string) bool {
+	return slices.Contains(builtinCommands, cmd)
+}
+
+func execBuiltinCmd(s Shell, cmd string, args []string){
 		switch cmd {
 		case "exit":
 			ExitCmd()
@@ -42,27 +56,13 @@ func RunCommand(s Shell, cmd string, args []string) {
 		default:
 			fmt.Printf("%s: command not found\n", cmd)
 		}
-		return
-	}
-
-	// Command executable
-	execCmd(s, cmd, args)
 }
 
-func execCmd(s Shell, cmd string, args []string) {
-	cmdPath, isExec := FindInPath(cmd, s.PathList())
-
-	if isExec {
-		eCmd := exec.Command(cmd, args...)
-		eCmd.Path = cmdPath
-		eCmd.Stdout = os.Stdout
-		eCmd.Stderr = os.Stderr
-		err := eCmd.Run()
-		if err != nil {
-      fmt.Print(err)
-		}
-	} else {
-		fmt.Printf("%s: command not found\n", cmd)
-	}
+func execCmd(s Shell, cmd string, cmdPath string, args []string) {
+  eCmd := exec.Command(cmd, args...)
+  eCmd.Path = cmdPath
+  eCmd.Stdout = os.Stdout
+  eCmd.Stderr = os.Stderr
+  eCmd.Run()
 	return
 }
