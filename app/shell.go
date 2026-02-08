@@ -5,27 +5,28 @@ import (
 	"fmt"
 	"os"
 	"strings"
+  "github.com/codecrafters-io/shell-starter-go/app/command"
 )
 
 type Shell struct {
 	reader   *bufio.Reader
 	pathList []string
-  wDir string
+	wDir     string
 }
 
 func NewShell() *Shell {
 	pathEnv := os.Getenv("PATH")
-  dir, err := os.Getwd()
-  if err != nil {
-    fmt.Print("error gathering the working directory")
-    os.Exit(1)
-  }
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Print("error gathering the working directory")
+		os.Exit(1)
+	}
 
 	pathList := strings.Split(pathEnv, string(os.PathListSeparator))
 	return &Shell{
 		reader:   bufio.NewReader(os.Stdin),
 		pathList: pathList,
-    wDir: dir,
+		wDir:     dir,
 	}
 }
 
@@ -45,12 +46,25 @@ func (s *Shell) Run() {
 			continue
 		}
 
-    trimmed_line := strings.TrimLeft(line, " \t")
-    cmd, args, found := strings.Cut(trimmed_line, " ")
-    if !found {
-      args = ""
-    }
+		trimmed_line := strings.TrimLeft(line, " \t")
+		cmd, args, found := strings.Cut(trimmed_line, " ")
+		if !found {
+			args = ""
+		}
 
-		RunCommand(s, cmd, args)
+		command.RunCommand(s, cmd, args)
 	}
 }
+
+func (s *Shell) WorkingDir() string {
+  return s.wDir
+}
+
+func (s *Shell) SetWorkingDir(dir string) {
+  s.wDir  = dir
+}
+
+func (s *Shell) PathList() []string {
+  return s.pathList
+}
+
