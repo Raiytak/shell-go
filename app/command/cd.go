@@ -8,7 +8,7 @@ import (
 )
 
 func CdCmd(s Shell, args []string) {
-  dir := strings.Join(args, "/")
+	dir := strings.Join(args, "/")
 	if len(dir) == 0 {
 		return
 	}

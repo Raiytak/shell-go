@@ -3,14 +3,16 @@ package command
 import (
 	"fmt"
 	"os"
+
+	//	"os"
 	"os/exec"
 	"slices"
 )
 
 type Shell interface {
-  WorkingDir() string
-  SetWorkingDir(dir string)
-  PathList() []string
+	WorkingDir() string
+	SetWorkingDir(dir string)
+	PathList() []string
 }
 
 // Other functions
@@ -28,41 +30,41 @@ func joinArgs(args []string) string {
 
 func RunCommand(s Shell, cmd string, args []string) {
 	if isBuiltin(cmd) {
-    execBuiltinCmd(s, cmd, args)
+		execBuiltinCmd(s, cmd, args)
 		return
-  } else if cmdPath, ok := CmdPath(cmd, s.PathList()); ok {
-    execCmd(s, cmd, cmdPath,args)
-  } else {
+	} else if cmdPath, ok := CmdPath(cmd, s.PathList()); ok {
+		execCmd(s, cmd, cmdPath, args)
+	} else {
 		fmt.Printf("%s: command not found\n", cmd)
-  }
+	}
 }
 
 func isBuiltin(cmd string) bool {
 	return slices.Contains(builtinCommands, cmd)
 }
 
-func execBuiltinCmd(s Shell, cmd string, args []string){
-		switch cmd {
-		case "exit":
-			ExitCmd()
-		case "type":
-			TypeCmd(s, args)
-		case "echo":
-			EchoCmd(args)
-		case "pwd":
-			PwdCmd(s, args)
-		case "cd":
-			CdCmd(s, args)
-		default:
-			fmt.Printf("%s: command not found\n", cmd)
-		}
+func execBuiltinCmd(s Shell, cmd string, args []string) {
+	switch cmd {
+	case "exit":
+		ExitCmd()
+	case "type":
+		TypeCmd(s, args)
+	case "echo":
+		EchoCmd(args)
+	case "pwd":
+		PwdCmd(s, args)
+	case "cd":
+		CdCmd(s, args)
+	default:
+		fmt.Printf("%s: command not found\n", cmd)
+	}
 }
 
 func execCmd(s Shell, cmd string, cmdPath string, args []string) {
-  eCmd := exec.Command(cmd, args...)
-  eCmd.Path = cmdPath
-  eCmd.Stdout = os.Stdout
-  eCmd.Stderr = os.Stderr
-  eCmd.Run()
+	eCmd := exec.Command(cmd, args...)
+	eCmd.Path = cmdPath
+	eCmd.Stdout = os.Stdout
+	eCmd.Stderr = os.Stderr
+	eCmd.Run()
 	return
 }

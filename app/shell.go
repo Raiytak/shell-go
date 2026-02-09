@@ -3,10 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/codecrafters-io/shell-starter-go/app/command"
 	"os"
-	"slices"
 	"strings"
+
+	"github.com/codecrafters-io/shell-starter-go/app/command"
+	"github.com/codecrafters-io/shell-starter-go/app/redirection"
 )
 
 type Shell struct {
@@ -33,6 +34,7 @@ func NewShell() *Shell {
 
 func (s *Shell) Run() {
 	stdout := os.Stdout
+	openFiles := []os.File{}
 	for {
 		os.Stdout = stdout
 		fmt.Print("$ ")
@@ -43,22 +45,10 @@ func (s *Shell) Run() {
 			continue
 		}
 
-		// Redirect output
-		if len(args) >= 2 && (args[len(args)-2] == ">" || args[len(args)-2] == "1>") {
-			file, err := os.Create(args[len(args)-1])
-			if err != nil {
-				fmt.Printf("error redirecting output: %s", err)
-				continue
-			}
-			defer file.Close()
-
-			os.Stdout = file
-			args = slices.Delete(args, len(args)-2, len(args))
-			// args = args[:len(args)-2]
-			// eCmd.Stderr = os.Stderr
-		}
+		args = redirection.SetRedirection(args, openFiles)
 
 		command.RunCommand(s, cmd, args)
+		closeFiles(openFiles)
 	}
 }
 
@@ -86,4 +76,11 @@ func (s *Shell) SetWorkingDir(dir string) {
 
 func (s *Shell) PathList() []string {
 	return s.pathList
+}
+
+func closeFiles(openFiles []os.File) {
+	for _, file := range openFiles {
+		file.Close()
+	}
+	openFiles = []os.File{}
 }
