@@ -14,6 +14,8 @@ type Shell struct {
 	reader   *bufio.Reader
 	pathList []string
 	wDir     string
+  stdout *os.File
+  stderr *os.File
 }
 
 func NewShell() *Shell {
@@ -29,6 +31,8 @@ func NewShell() *Shell {
 		reader:   bufio.NewReader(os.Stdin),
 		pathList: pathList,
 		wDir:     dir,
+    stdout: &os.Stdout,
+    stderr: &os.Stderr,
 	}
 }
 
