@@ -5,43 +5,41 @@ import (
 	"slices"
 )
 
-var redirectionSymbols = []string{">", "1>", "2>"}
+var redirectionSymbols = []string{">", "1>", "2>", ">>", "2>>"}
 
-func SetRedirection(args []string, openFiles []os.File) []string {
+func SetRedirection(args []string, openFiles []*os.File) []string {
 	if len(args) <= 1 {
 		return args
 	}
 
-	for i := 0; i < 2; i++ {
+	var f *os.File
+	for {
 		if hasRedirection(args) {
-			symbol, file := args[len(args)-2], args[len(args)-1]
-			if isStdoutRedirectionSymbol(symbol) {
-				setStdoutRedirection(file, openFiles)
-			} else if isStderrRedirectionSymbol(symbol) {
-				setStderrRedirection(file, openFiles)
+			symbol, filePath := args[len(args)-2], args[len(args)-1]
+			if isStdoutRedirection(symbol) {
+				f = setRedirection(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, &os.Stdout)
+			} else if isStderrRedirection(symbol) {
+				f = setRedirection(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, &os.Stderr)
+			} else if isStdoutAppend(symbol) {
+				f = setRedirection(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, &os.Stdout)
+			} else if isStderrAppend(symbol) {
+				f = setRedirection(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, &os.Stderr)
 			}
+			openFiles = append(openFiles, f)
 			args = slices.Delete(args, len(args)-2, len(args))
+		} else {
+			return args
 		}
 	}
-  return args
 }
 
-func setStdoutRedirection(filePath string, openFiles []os.File) {
-	file, err := os.Create(filePath)
+func setRedirection(filePath string, flag int, out **os.File) *os.File {
+	f, err := os.OpenFile(filePath, flag, 0644)
 	if err != nil {
 		panic(err)
 	}
-	os.Stdout = file
-	openFiles = append(openFiles, *file)
-}
-
-func setStderrRedirection(filePath string, openFiles []os.File) {
-	file, err := os.Create(filePath)
-	if err != nil {
-		panic(err)
-	}
-	os.Stderr = file
-	openFiles = append(openFiles, *file)
+	*out = f
+	return f
 }
 
 func hasRedirection(args []string) bool {
@@ -57,10 +55,18 @@ func isRedirectionSymbol(arg string) bool {
 	return slices.Contains(redirectionSymbols, arg)
 }
 
-func isStdoutRedirectionSymbol(arg string) bool {
+func isStdoutRedirection(arg string) bool {
 	return (arg == ">" || arg == "1>")
 }
 
-func isStderrRedirectionSymbol(arg string) bool {
+func isStderrRedirection(arg string) bool {
 	return arg == "2>"
+}
+
+func isStdoutAppend(arg string) bool {
+	return arg == ">>"
+}
+
+func isStderrAppend(arg string) bool {
+	return arg == "2>>"
 }

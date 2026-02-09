@@ -33,10 +33,11 @@ func NewShell() *Shell {
 }
 
 func (s *Shell) Run() {
-	stdout := os.Stdout
-	openFiles := []os.File{}
+	stdout, stderr := os.Stdout, os.Stderr
+	var openFiles []*os.File
 	for {
 		os.Stdout = stdout
+		os.Stderr = stderr
 		fmt.Print("$ ")
 
 		cmd, args, err := processUserInput(s)
@@ -78,9 +79,9 @@ func (s *Shell) PathList() []string {
 	return s.pathList
 }
 
-func closeFiles(openFiles []os.File) {
+func closeFiles(openFiles []*os.File) {
 	for _, file := range openFiles {
 		file.Close()
 	}
-	openFiles = []os.File{}
+	openFiles = []*os.File{}
 }
