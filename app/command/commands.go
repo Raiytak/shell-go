@@ -2,9 +2,8 @@ package command
 
 import (
 	"fmt"
-	"os"
+	"io"
 
-	//	"os"
 	"os/exec"
 	"slices"
 )
@@ -13,6 +12,10 @@ type Shell interface {
 	WorkingDir() string
 	SetWorkingDir(dir string)
 	PathList() []string
+	GetStdout() io.Writer
+	GetStderr() io.Writer
+	SetStdout(io.Writer)
+	SetStderr(io.Writer)
 }
 
 // Other functions
@@ -63,8 +66,8 @@ func execBuiltinCmd(s Shell, cmd string, args []string) {
 func execCmd(s Shell, cmd string, cmdPath string, args []string) {
 	eCmd := exec.Command(cmd, args...)
 	eCmd.Path = cmdPath
-	eCmd.Stdout = os.Stdout
-	eCmd.Stderr = os.Stderr
+	eCmd.Stdout = s.GetStdout()
+	eCmd.Stderr = s.GetStderr()
 	eCmd.Run()
 	return
 }

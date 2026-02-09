@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -14,8 +15,8 @@ type Shell struct {
 	reader   *bufio.Reader
 	pathList []string
 	wDir     string
-  stdout *os.File
-  stderr *os.File
+	stdout   io.Writer
+	stderr   io.Writer
 }
 
 func NewShell() *Shell {
@@ -31,17 +32,18 @@ func NewShell() *Shell {
 		reader:   bufio.NewReader(os.Stdin),
 		pathList: pathList,
 		wDir:     dir,
-    stdout: &os.Stdout,
-    stderr: &os.Stderr,
+		stdout:   os.Stdout,
+		stderr:   os.Stderr,
 	}
 }
 
 func (s *Shell) Run() {
-	stdout, stderr := os.Stdout, os.Stderr
+	stdout := os.Stdout
+	stderr := os.Stderr
 	var openFiles []*os.File
 	for {
-		os.Stdout = stdout
-		os.Stderr = stderr
+		s.SetStdout(stdout)
+		s.SetStderr(stderr)
 		fmt.Print("$ ")
 
 		cmd, args, err := processUserInput(s)
@@ -50,11 +52,27 @@ func (s *Shell) Run() {
 			continue
 		}
 
-		args = redirection.SetRedirection(args, openFiles)
+		args = redirection.SetRedirection(s, args, openFiles)
 
 		command.RunCommand(s, cmd, args)
 		closeFiles(openFiles)
 	}
+}
+
+func (s *Shell) SetStdout(w io.Writer) {
+	s.stdout = w
+}
+
+func (s *Shell) GetStdout() io.Writer {
+	return s.stdout
+}
+
+func (s *Shell) SetStderr(w io.Writer) {
+	s.stderr = w
+}
+
+func (s *Shell) GetStderr() io.Writer {
+	return s.stderr
 }
 
 func processUserInput(s *Shell) (cmd string, args []string, err error) {
