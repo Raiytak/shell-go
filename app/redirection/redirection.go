@@ -5,7 +5,7 @@ import (
 	"slices"
 )
 
-var redirectionSymbols = []string{">", "1>", "2>", ">>", "2>>"}
+var redirectionSymbols = []string{">", "1>", "2>", ">>", "1>>", "2>>"}
 
 func SetRedirection(args []string, openFiles []*os.File) []string {
 	if len(args) <= 1 {
@@ -64,7 +64,7 @@ func isStderrRedirection(arg string) bool {
 }
 
 func isStdoutAppend(arg string) bool {
-	return arg == ">>"
+	return (arg == ">>" || arg == "1>>")
 }
 
 func isStderrAppend(arg string) bool {

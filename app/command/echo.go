@@ -12,11 +12,11 @@ func EchoCmd(args []string) {
 	if firstChar == '"' || firstChar == '\'' {
 		if firstChar != lastChar {
 			fmt.Print("Unclosed string\n")
+			fmt.Printf("first string %s, last string %s", firstString, lastString)
 			return
 		}
 		args[0] = firstString[1:]
 		args[len(args)-1] = lastString[:len(lastString)-1]
 	}
 	fmt.Println(strings.Join(args, " "))
-
 }
