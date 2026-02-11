@@ -82,6 +82,7 @@ func appendHistory(s Shell, filename string) (stderr []string) {
 		return []string{fmt.Sprintf("error opening file: %s", filename)}
 	}
   lines := strings.Split(string(data), "\n")
+  lines = lines[:len(lines)-1]
   for _, l := range s.History() {
     lines = append(lines, l)
   }
