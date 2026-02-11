@@ -19,6 +19,7 @@ type Shell interface {
 	SetStderr(io.Writer)
 	History() []string
 	UpdateHistory(string)
+  ResetHistory()
 }
 
 var builtinCommands = []string{

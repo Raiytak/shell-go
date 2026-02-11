@@ -50,8 +50,10 @@ func historyPersistence(s Shell, action string, filename string) (stdout []strin
 		stderr = readHistory(s, filename)
 	case "-w":
 		stderr = writeHistory(s, filename)
+    s.ResetHistory()
 	case "-a":
 		stderr = appendHistory(s, filename)
+    s.ResetHistory()
 	}
 	return stdout, stderr
 }

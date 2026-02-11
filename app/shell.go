@@ -185,6 +185,10 @@ func (s *Shell) UpdateHistory(command string) {
 	s.history = append(s.history, command)
 }
 
+func (s *Shell) ResetHistory() {
+  s.history = []string{}
+}
+
 func (s *Shell) GetOpenFiles() []*os.File {
 	return s.openFiles
 }
