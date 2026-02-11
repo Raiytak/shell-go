@@ -12,11 +12,13 @@ type Shell interface {
 	PathList() []string
 	SetStdout(io.Writer)
 	SetStderr(io.Writer)
+	SetOpenFiles([]*os.File)
 }
 
 var redirectionSymbols = []string{">", "1>", "2>", ">>", "1>>", "2>>"}
 
-func SetRedirection(s Shell, args []string, openFiles []*os.File) []string {
+func SetRedirection(s Shell, args []string) []string {
+	var openFiles []*os.File
 	if len(args) <= 1 {
 		return args
 	}
@@ -57,6 +59,7 @@ func SetRedirection(s Shell, args []string, openFiles []*os.File) []string {
 			}
 			setStdout(s, fStdout)
 			setStderr(s, fStderr)
+			s.SetOpenFiles(openFiles)
 			return args
 		}
 	}

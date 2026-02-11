@@ -16,15 +16,17 @@ import (
 var delimiter = []byte{'"', '\''}
 
 type Shell struct {
-	reader   *bufio.Reader
-	pathList []string
-	wDir     string
-	stdout   io.Writer
-	stderr   io.Writer
-	history  []string
+	reader    *bufio.Reader
+	pathList  []string
+	wDir      string
+	stdin     io.Reader
+	stdout    io.Writer
+	stderr    io.Writer
+	history   []string
+	openFiles []*os.File
 }
 
-func NewShell() *Shell {
+func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 	pathEnv := os.Getenv("PATH")
 	dir, err := os.Getwd()
 	if err != nil {
@@ -34,24 +36,25 @@ func NewShell() *Shell {
 
 	pathList := strings.Split(pathEnv, string(os.PathListSeparator))
 	return &Shell{
-		reader:   bufio.NewReader(os.Stdin),
-		pathList: pathList,
-		wDir:     dir,
-		stdout:   os.Stdout,
-		stderr:   os.Stderr,
-		history:  []string{},
+		reader:    bufio.NewReader(os.Stdin),
+		pathList:  pathList,
+		wDir:      dir,
+		stdin:     stdin,
+		stdout:    stdout,
+		stderr:    stderr,
+		history:   []string{},
+		openFiles: []*os.File{},
 	}
 }
 
 func (s *Shell) Run() {
-	stdout := os.Stdout
-	stderr := os.Stderr
-	var openFiles []*os.File
-	defer closeFiles(openFiles)
+	defaultStdout := s.stdout
+	defaultStderr := s.stderr
+	defer closeFiles(s)
 
 	for {
-		s.SetStdout(stdout)
-		s.SetStderr(stderr)
+		s.SetStdout(defaultStdout)
+		s.SetStderr(defaultStderr)
 		fmt.Print("$ ")
 
 		cmd, args, err := getCommand(s)
@@ -60,10 +63,10 @@ func (s *Shell) Run() {
 			continue
 		}
 
-		args = redirection.SetRedirection(s, args, openFiles)
+		args = redirection.SetRedirection(s, args)
 
 		command.RunCommand(s, cmd, args)
-		closeFiles(openFiles)
+		closeFiles(s)
 	}
 }
 
@@ -155,11 +158,11 @@ func (s *Shell) PathList() []string {
 	return s.pathList
 }
 
-func closeFiles(openFiles []*os.File) {
-	for _, file := range openFiles {
+func closeFiles(s *Shell) {
+	for _, file := range s.GetOpenFiles() {
 		file.Close()
 	}
-	openFiles = []*os.File{}
+	s.SetOpenFiles([]*os.File{})
 }
 
 func (s *Shell) History() []string {
@@ -168,4 +171,12 @@ func (s *Shell) History() []string {
 
 func (s *Shell) UpdateHistory(command string) {
 	s.history = append(s.history, command)
+}
+
+func (s *Shell) GetOpenFiles() []*os.File {
+	return s.openFiles
+}
+
+func (s *Shell) SetOpenFiles(openFiles []*os.File) {
+	s.openFiles = openFiles
 }

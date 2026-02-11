@@ -1,6 +1,8 @@
 package main
 
+import "os"
+
 func main() {
-	shell := NewShell()
+	shell := NewShell(os.Stdin, os.Stdout, os.Stderr)
 	shell.Run()
 }
