@@ -183,7 +183,7 @@ func (s *Shell) History() []string {
 }
 
 func (s *Shell) UpdateHistory(line string) {
-	if line != "" {
+	if (line != "" && line != "\n") {
 		s.history = append(s.history, line)
 	}
 }
