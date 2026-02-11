@@ -79,7 +79,7 @@ func writeHistory(s Shell, filename string, flag int) (stderr []string) {
 	}
 	defer f.Close()
 
-	_, err = f.WriteString(strings.Join(s.History(), "\n"))
+	_, err = f.WriteString(append(strings.Join(s.History(), "\n"), ""))
 	if err != nil {
 		return []string{fmt.Sprintf("error writing file: %s", filename)}
 	}
