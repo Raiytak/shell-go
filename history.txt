@@ -1,1 +1,2 @@
-: 1770852204:0;codecrafters submit
+export HISTFILE=history.txt 
+./your_program.sh 
