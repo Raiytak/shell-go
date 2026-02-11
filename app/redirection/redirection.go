@@ -1,6 +1,7 @@
 package redirection
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"slices"
@@ -51,11 +52,11 @@ func SetRedirection(s Shell, args []string, openFiles []*os.File) []string {
 		} else {
 			if !stdoutRedirected {
 				fStdout = append(fStdout, os.Stdout)
-        fmt.Print("stdout redirected")
+				fmt.Print("stdout redirected")
 			}
 			if !stderrRedirected {
 				fStderr = append(fStderr, os.Stderr)
-        fmt.Print("stdout redirected")
+				fmt.Print("stdout redirected")
 			}
 			setStdout(s, fStdout)
 			setStderr(s, fStderr)
