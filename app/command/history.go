@@ -49,9 +49,9 @@ func historyPersistence(s Shell, action string, filename string) (stdout []strin
 	case "-r":
 		stderr = readHistory(s, filename)
 	case "-w":
-		stderr = writeHistory(s, filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
+		stderr = writeHistory(s, filename)
 	case "-a":
-		stderr = writeHistory(s, filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
+		stderr = appendHistory(s, filename)
 	}
 	return stdout, stderr
 }
@@ -72,14 +72,30 @@ func readHistory(s Shell, filename string) (stderr []string) {
 	return stderr
 }
 
-func writeHistory(s Shell, filename string, flag int) (stderr []string) {
-	f, err := os.OpenFile(filename, flag, 0644)
+func writeHistory(s Shell, filename string) (stderr []string) {
+  return saveHistory(filename, s.History())
+}
+
+func appendHistory(s Shell, filename string) (stderr []string) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return []string{fmt.Sprintf("error opening file: %s", filename)}
+	}
+  lines := strings.Split(string(data), "\n")
+  for _, l := range s.History() {
+    lines = append(lines, l)
+  }
+  return saveHistory(filename, lines)
+}
+
+func saveHistory(filename string, lines []string) (stderr []string) {
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return []string{fmt.Sprintf("error opening file: %s", filename)}
 	}
 	defer f.Close()
 
-	_, err = f.WriteString(strings.Join(append(s.History(), ""), "\n"))
+	_, err = f.WriteString(strings.Join(append(lines, ""), "\n"))
 	if err != nil {
 		return []string{fmt.Sprintf("error writing file: %s", filename)}
 	}
