@@ -48,6 +48,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 }
 
 func (s *Shell) Run() {
+  var stdout, stderr []string
 	defaultStdout := s.stdout
 	defaultStderr := s.stderr
 	defer closeFiles(s)
@@ -65,7 +66,12 @@ func (s *Shell) Run() {
 
 		args = redirection.SetRedirection(s, args)
 
-		command.RunCommand(s, cmd, args)
+		stdout, stderr = command.RunCommand(s, cmd, args)
+    err = display(s, stdout, stderr)
+    if err != nil {
+      panic(err)
+    }
+
 		closeFiles(s)
 	}
 }
@@ -180,3 +186,24 @@ func (s *Shell) GetOpenFiles() []*os.File {
 func (s *Shell) SetOpenFiles(openFiles []*os.File) {
 	s.openFiles = openFiles
 }
+
+func display(s *Shell, stdout []string, stderr []string) (err error) {
+  var lines []string
+  var output io.Writer
+  switch {
+  case len(stdout) > 0:
+    lines = stdout
+    output = s.GetStdout()
+  case len(stderr) > 0:
+    lines = stderr
+    output = s.GetStderr()
+  }
+	for _, line := range lines {
+		_, err := fmt.Fprintln(output, line)
+		if err != nil {
+      return err
+		}
+	}
+  return err
+}
+

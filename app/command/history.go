@@ -1,45 +1,36 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 )
 
-func HistoryCmd(s Shell, args []string) error {
+func HistoryCmd(s Shell, args []string) (stdout []string, stderr []string) {
 	history := s.History()
-	var lines []string
-	var err error
 	switch {
 	case len(args) == 0:
-		lines = completeHistory(history)
+		stdout = completeHistory(history)
 	case len(args) == 1:
 		limit := args[0]
-		lines, err = limitHistory(history, limit)
-		if err != nil {
-			return err
-		}
+		stdout, stderr = limitHistory(history, limit)
 	case len(args) > 1:
-		return errors.New("too many arguments")
+		return stdout, []string{"too many arguments"}
 	}
-	display(s, lines)
-	return nil
+	return stdout, stderr
 }
 
-func completeHistory(history []string) []string {
-	var lines []string
+func completeHistory(history []string) (stdout []string) {
 	for i, h := range history {
-		lines = append(lines, fmt.Sprintf("    %d  %s", i+1, h))
+		stdout = append(stdout, fmt.Sprintf("    %d  %s", i+1, h))
 	}
-	lines = append(lines, fmt.Sprintf("    %d  history", len(history)+1))
-	return lines
+	stdout = append(stdout, fmt.Sprintf("    %d  history", len(history)+1))
+	return stdout
 }
 
-func limitHistory(history []string, limit string) ([]string, error) {
-	var lines []string
+func limitHistory(history []string, limit string) (stdout []string, stderr []string) {
 	l, err := strconv.Atoi(limit)
 	if err != nil {
-		return lines, errors.New(fmt.Sprintf("%s: argument not handled", limit))
+		return stdout, []string{fmt.Sprintf("%s: argument not handled", limit)}
 	}
 
 	start := len(history) - l + 1
@@ -47,8 +38,8 @@ func limitHistory(history []string, limit string) ([]string, error) {
 		start = 0
 	}
 	for i := start; i < len(history); i++ {
-		lines = append(lines, fmt.Sprintf("    %d  %s", i+1, history[i]))
+		stdout = append(stdout, fmt.Sprintf("    %d  %s", i+1, history[i]))
 	}
-	lines = append(lines, fmt.Sprintf("    %d  history %d", len(history)+1, l))
-	return lines, nil
+	stdout = append(stdout, fmt.Sprintf("    %d  history %d", len(history)+1, l))
+	return stdout, stderr
 }

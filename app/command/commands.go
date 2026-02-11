@@ -43,58 +43,50 @@ func joinArgs(args []string) string {
 	return result
 }
 
-func RunCommand(s Shell, cmd string, args []string) {
+func RunCommand(s Shell, cmd string, args []string) (stdout []string, stderr []string) {
 	command := strings.Join(append([]string{cmd}, args...), " ")
 	cmdPath, isExec := CmdPath(cmd, s.PathList())
 	switch {
 	case isBuiltin(cmd):
-		execBuiltinCmd(s, cmd, args)
+		stdout, stderr = execBuiltinCmd(s, cmd, args)
 	case isExec:
-		execCmd(s, cmd, cmdPath, args)
+		stdout, stderr = execCmd(s, cmd, cmdPath, args)
 	default:
-		fmt.Printf("%s: command not found\n", cmd)
+		stderr = []string{fmt.Sprintf("%s: command not found", cmd)}
 	}
 	s.UpdateHistory(command)
-	return
+	return stdout, stderr
 }
 
 func isBuiltin(cmd string) bool {
 	return slices.Contains(builtinCommands, cmd)
 }
 
-func execBuiltinCmd(s Shell, cmd string, args []string) {
+func execBuiltinCmd(s Shell, cmd string, args []string) (stdout []string, stderr []string) {
 	switch cmd {
 	case "exit":
 		ExitCmd()
 	case "type":
-		TypeCmd(s, args)
+		stdout, stderr = TypeCmd(s, args)
 	case "echo":
-		EchoCmd(s, args)
+		stdout, stderr = EchoCmd(args)
 	case "pwd":
-		PwdCmd(s, args)
+		stdout, stderr = PwdCmd(s, args)
 	case "cd":
-		CdCmd(s, args)
+		stderr = CdCmd(s, args)
 	case "history":
-		HistoryCmd(s, args)
+		stdout, stderr = HistoryCmd(s, args)
 	default:
-		fmt.Printf("%s: command not found\n", cmd)
+		stderr = []string{fmt.Sprintf("%s: command not found", cmd)}
 	}
+	return stdout, stderr
 }
 
-func execCmd(s Shell, cmd string, cmdPath string, args []string) {
+func execCmd(s Shell, cmd string, cmdPath string, args []string) (stdout []string, stderr []string) {
 	eCmd := exec.Command(cmd, args...)
 	eCmd.Path = cmdPath
 	eCmd.Stdout = s.GetStdout()
 	eCmd.Stderr = s.GetStderr()
 	eCmd.Run()
-	return
-}
-
-func display(s Shell, lines []string) {
-	for _, line := range lines {
-		_, err := fmt.Fprintln(s.GetStdout(), line)
-		if err != nil {
-			panic(err)
-		}
-	}
+	return stdout, stderr
 }

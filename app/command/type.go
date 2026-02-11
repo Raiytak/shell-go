@@ -5,12 +5,9 @@ import (
 	"slices"
 )
 
-func TypeCmd(s Shell, args []string) {
-	var lines []string
+func TypeCmd(s Shell, args []string) (stdout []string, stderr []string) {
 	if len(args) == 0 {
-		lines = []string{fmt.Sprintln(": not found")}
-		display(s, lines)
-		return
+		return stdout, []string{fmt.Sprintln(": not found")}
 	}
 
 	cmd := args[0]
@@ -18,19 +15,15 @@ func TypeCmd(s Shell, args []string) {
 
 	// Built-in Function
 	if ok := slices.Contains(builtinCommands, cmd); ok {
-		lines = []string{fmt.Sprintf("%s is a shell builtin", cmd)}
-		display(s, lines)
-		return
+		return []string{fmt.Sprintf("%s is a shell builtin", cmd)}, stderr
 	}
 
 	// Function Found in PATH
 	cmdPath, isExec := CmdPath(cmd, pathList)
 	if isExec {
-		lines = []string{fmt.Sprintf("%s is %s", cmd, cmdPath)}
-		display(s, lines)
-		return
+		return []string{fmt.Sprintf("%s is %s", cmd, cmdPath)}, stderr
 	}
 
-	lines = []string{fmt.Sprintf("%s: not found", cmd)}
-	display(s, lines)
+	// Command not found
+	return stdout, []string{fmt.Sprintf("%s: not found", cmd)}
 }

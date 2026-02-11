@@ -4,7 +4,6 @@ import (
 	"strings"
 )
 
-func EchoCmd(s Shell, args []string) {
-	lines := []string{strings.Join(args, " ")}
-	display(s, lines)
+func EchoCmd(args []string) ([]string, []string) {
+	return []string{strings.Join(args, " ")}, []string{}
 }

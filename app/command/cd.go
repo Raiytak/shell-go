@@ -7,9 +7,8 @@ import (
 	"strings"
 )
 
-func CdCmd(s Shell, args []string) {
+func CdCmd(s Shell, args []string) (stderr []string) {
 	dir := strings.Join(args, "/")
-	var lines []string
 	if len(dir) == 0 {
 		return
 	}
@@ -24,14 +23,12 @@ func CdCmd(s Shell, args []string) {
 	}
 	_, err := os.Stat(wDir)
 	if err != nil {
-		lines = []string{fmt.Sprintf("cd: %s: No such file or directory", wDir)}
-		display(s, lines)
-		return
+		return []string{fmt.Sprintf("cd: %s: No such file or directory", wDir)}
 	}
 	err = os.Chdir(wDir)
 	if err != nil {
-		lines = []string{fmt.Sprintf("error while changing directory")}
-		display(s, lines)
+		return []string{fmt.Sprintf("error while changing directory")}
 	}
 	s.SetWorkingDir(wDir)
+	return stderr
 }

@@ -1,11 +1,8 @@
 package command
 
-func PwdCmd(s Shell, args []string) {
-	var lines []string
+func PwdCmd(s Shell, args []string) (stdout []string, stderr []string) {
 	if len(args) != 0 {
-		lines = []string{("pwd: too many arguments")}
-	} else {
-		lines = []string{s.WorkingDir()}
+		return stdout, []string{("pwd: too many arguments")}
 	}
-	display(s, lines)
+	return []string{s.WorkingDir()}, stderr
 }
