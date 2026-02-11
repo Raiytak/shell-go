@@ -22,7 +22,6 @@ func HistoryCmd(s Shell, args []string) error {
 	case len(args) > 1:
 		return errors.New("too many arguments")
 	}
-	lines = append(lines, fmt.Sprintf("    %d  history", len(history) + 1))
 	display(s, lines)
 	return nil
 }
@@ -32,6 +31,7 @@ func completeHistory(history []string) []string {
 	for i, h := range history {
 		lines = append(lines, fmt.Sprintf("    %d  %s", i+1, h))
 	}
+	lines = append(lines, fmt.Sprintf("    %d  history", len(history) + 1))
 	return lines
 }
 
@@ -49,5 +49,6 @@ func limitHistory(history []string, limit string) ([]string, error) {
 	for i := start; i < len(history); i++ {
 		lines = append(lines, fmt.Sprintf("    %d  %s", i+1, history[i]))
 	}
+	lines = append(lines, fmt.Sprintf("    %d  history %d", len(history) + 1, limit))
 	return lines, nil
 }
