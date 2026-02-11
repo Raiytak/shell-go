@@ -35,8 +35,9 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		os.Exit(1)
 	}
 	rl, err := readline.New("$ ")
+	history, err := command.ReadHistory(os.Getenv("HISTFILE"))
 	if err != nil {
-		fmt.Print("error creating readline")
+		fmt.Print("error creating readline\n")
 		os.Exit(1)
 	}
 
@@ -48,7 +49,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		stdin:     stdin,
 		stdout:    stdout,
 		stderr:    stderr,
-		history:   []string{},
+		history:   history,
 		openFiles: []*os.File{},
 	}
 }
@@ -181,12 +182,14 @@ func (s *Shell) History() []string {
 	return s.history
 }
 
-func (s *Shell) UpdateHistory(command string) {
-	s.history = append(s.history, command)
+func (s *Shell) UpdateHistory(line string) {
+	if line != "" {
+		s.history = append(s.history, line)
+	}
 }
 
 func (s *Shell) ResetHistory() {
-  s.history = []string{}
+	s.history = []string{}
 }
 
 func (s *Shell) GetOpenFiles() []*os.File {

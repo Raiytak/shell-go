@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -47,35 +48,40 @@ func limitHistory(history []string, limit string) (stdout []string, stderr []str
 func historyPersistence(s Shell, action string, filename string) (stdout []string, stderr []string) {
 	switch action {
 	case "-r":
-		stderr = readHistory(s, filename)
+		stderr = importHistory(s, filename)
 	case "-w":
 		stderr = writeHistory(s, filename)
-    s.ResetHistory()
+		s.ResetHistory()
 	case "-a":
 		stderr = appendHistory(s, filename)
-    s.ResetHistory()
+		s.ResetHistory()
 	}
 	return stdout, stderr
 }
 
-func readHistory(s Shell, filename string) (stderr []string) {
-	data, err := os.ReadFile(filename)
+func importHistory(s Shell, filename string) (stderr []string) {
+	lines, err := ReadHistory(filename)
 	if err != nil {
-		return []string{"error opening file"}
+		stderr = []string{"error reading history file"}
 	}
-
-	content := string(data)
-	history := strings.Split(content, "\n")
-	for _, line := range history {
-		if line != "" {
-			s.UpdateHistory(line)
-		}
+	for _, line := range lines {
+		s.UpdateHistory(line)
 	}
 	return stderr
 }
 
+func ReadHistory(filename string) (lines []string, err error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return lines, errors.New("error opening file")
+	}
+	content := string(data)
+	lines = strings.Split(content, "\n")
+	return lines, err
+}
+
 func writeHistory(s Shell, filename string) (stderr []string) {
-  return saveHistory(filename, s.History())
+	return saveHistory(filename, s.History())
 }
 
 func appendHistory(s Shell, filename string) (stderr []string) {
@@ -83,12 +89,12 @@ func appendHistory(s Shell, filename string) (stderr []string) {
 	if err != nil {
 		return []string{fmt.Sprintf("error opening file: %s", filename)}
 	}
-  lines := strings.Split(string(data), "\n")
-  lines = lines[:len(lines)-1]
-  for _, l := range s.History() {
-    lines = append(lines, l)
-  }
-  return saveHistory(filename, lines)
+	lines := strings.Split(string(data), "\n")
+	lines = lines[:len(lines)-1]
+	for _, l := range s.History() {
+		lines = append(lines, l)
+	}
+	return saveHistory(filename, lines)
 }
 
 func saveHistory(filename string, lines []string) (stderr []string) {
