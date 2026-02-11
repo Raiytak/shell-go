@@ -69,7 +69,9 @@ func readHistory(s Shell, filename string) (stderr []string) {
 	history := strings.Split(content, "\n")
 	history = slices.Insert(history, 0, fmt.Sprintf("history -r %s", filename))
 	for _, line := range history {
-		s.UpdateHistory(line)
+    if line != "" {
+      s.UpdateHistory(line)
+    }
 	}
 	return stderr
 }
