@@ -47,6 +47,8 @@ func (s *Shell) Run() {
 	stdout := os.Stdout
 	stderr := os.Stderr
 	var openFiles []*os.File
+	defer closeFiles(openFiles)
+
 	for {
 		s.SetStdout(stdout)
 		s.SetStderr(stderr)
@@ -96,6 +98,10 @@ func getCommand(s *Shell) (string, []string, error) {
 		return cmd, args, err
 	}
 
+  if cmd == "" {
+    return cmd, args, err
+  }
+
 	cmd = fields[0]
 	if len(fields) > 1 {
 		args = fields[1:]
@@ -107,6 +113,10 @@ func tokenize(line string) ([]string, error) {
 	var fields []string
 	var token string
 	var d byte
+
+  if len(line) == 0 {
+    return fields, nil
+  }
 
 	cleanedLine := strings.Join(strings.Fields(line), " ")
 	for i := 0; i < len(cleanedLine); i++ {
