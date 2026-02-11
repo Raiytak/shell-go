@@ -42,12 +42,12 @@ func limitHistory(history []string, limit string) ([]string, error) {
 		return lines, errors.New(fmt.Sprintf("%s: argument not handled", limit))
 	}
 
-  start := len(history) - l
+  start := len(history) - l + 1
   if start < 0 {
     start = 0
   }
 	for i := start; i < len(history); i++ {
-		lines = append(lines, fmt.Sprintf("    %d  %s", i, history[i]))
+		lines = append(lines, fmt.Sprintf("    %d  %s", i+1, history[i]))
 	}
 	return lines, nil
 }
