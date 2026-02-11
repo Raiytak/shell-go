@@ -46,6 +46,7 @@ func joinArgs(args []string) string {
 func RunCommand(s Shell, cmd string, args []string) (stdout []string, stderr []string) {
 	command := strings.Join(append([]string{cmd}, args...), " ")
 	cmdPath, isExec := CmdPath(cmd, s.PathList())
+	s.UpdateHistory(command)
 	switch {
 	case isBuiltin(cmd):
 		stdout, stderr = execBuiltinCmd(s, cmd, args)
@@ -54,7 +55,6 @@ func RunCommand(s Shell, cmd string, args []string) (stdout []string, stderr []s
 	default:
 		stderr = []string{fmt.Sprintf("%s: command not found", cmd)}
 	}
-	s.UpdateHistory(command)
 	return stdout, stderr
 }
 

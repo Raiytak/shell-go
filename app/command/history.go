@@ -28,7 +28,6 @@ func HistoryCmd(s Shell, args []string) (stdout []string, stderr []string) {
 
 func completeHistory(history []string) (stdout []string, stderr []string) {
 	stdout, stderr = getHistory(history, 0)
-	stdout = append(stdout, fmt.Sprintf("    %d  %s", len(history)+1, "history"))
 	return stdout, stderr
 }
 
@@ -43,7 +42,6 @@ func limitHistory(history []string, limit string) (stdout []string, stderr []str
 		start = 0
 	}
 	stdout, stderr = getHistory(history, start)
-	stdout = append(stdout, fmt.Sprintf("    %d  %s", len(history)+1, fmt.Sprintf("history %d", limit)))
 	return stdout, stderr
 }
 
