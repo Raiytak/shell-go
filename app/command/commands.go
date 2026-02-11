@@ -46,7 +46,6 @@ func joinArgs(args []string) string {
 func RunCommand(s Shell, cmd string, args []string) {
 	command := strings.Join(append([]string{cmd}, args...), " ")
 	cmdPath, isExec := CmdPath(cmd, s.PathList())
-  s.UpdateHistory(command)
 	switch {
 	case isBuiltin(cmd):
 		execBuiltinCmd(s, cmd, args)
@@ -55,6 +54,7 @@ func RunCommand(s Shell, cmd string, args []string) {
 	default:
 		fmt.Printf("%s: command not found\n", cmd)
 	}
+	s.UpdateHistory(command)
 	return
 }
 
@@ -75,7 +75,7 @@ func execBuiltinCmd(s Shell, cmd string, args []string) {
 	case "cd":
 		CdCmd(s, args)
 	case "history":
-		HistoryCmd(s)
+		HistoryCmd(s, args)
 	default:
 		fmt.Printf("%s: command not found\n", cmd)
 	}
@@ -90,9 +90,11 @@ func execCmd(s Shell, cmd string, cmdPath string, args []string) {
 	return
 }
 
-func display(s Shell, line string) {
-	_, err := fmt.Fprintln(s.GetStdout(), line)
-	if err != nil {
-		panic(err)
+func display(s Shell, lines []string) {
+	for _, line := range lines {
+		_, err := fmt.Fprintln(s.GetStdout(), line)
+		if err != nil {
+			panic(err)
+		}
 	}
 }

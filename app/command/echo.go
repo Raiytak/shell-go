@@ -5,5 +5,6 @@ import (
 )
 
 func EchoCmd(s Shell, args []string) {
-	display(s, strings.Join(args, " "))
+	lines := []string{strings.Join(args, " ")}
+	display(s, lines)
 }
