@@ -49,6 +49,6 @@ func limitHistory(history []string, limit string) ([]string, error) {
 	for i := start; i < len(history); i++ {
 		lines = append(lines, fmt.Sprintf("    %d  %s", i+1, history[i]))
 	}
-	lines = append(lines, fmt.Sprintf("    %d  history %d", len(history) + 1, limit))
+	lines = append(lines, fmt.Sprintf("    %d  history %d", len(history) + 1, l))
 	return lines, nil
 }
