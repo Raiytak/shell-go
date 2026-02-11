@@ -94,11 +94,7 @@ func getCommand(s *Shell) (string, []string, error) {
 	}
 
 	fields, err := tokenize(line)
-	if err != nil {
-		return cmd, args, err
-	}
-
-	if cmd == "" {
+	if err != nil || len(fields) == 0 {
 		return cmd, args, err
 	}
 

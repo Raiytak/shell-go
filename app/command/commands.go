@@ -44,7 +44,6 @@ func joinArgs(args []string) string {
 }
 
 func RunCommand(s Shell, cmd string, args []string) {
-
 	command := strings.Join(append([]string{cmd}, args...), " ")
 	cmdPath, isExec := CmdPath(cmd, s.PathList())
 	switch {
