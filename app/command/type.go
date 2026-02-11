@@ -5,7 +5,13 @@ import (
 	"slices"
 )
 
-func TypeCmd(s Shell, cmd string) {
+func TypeCmd(s Shell, args []string) {
+	if len(args) == 0 {
+		display(s, fmt.Sprintln(": not found"))
+		return
+	}
+
+	cmd := args[0]
 	pathList := s.PathList()
 
 	// Built-in Function

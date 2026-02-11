@@ -68,7 +68,7 @@ func execBuiltinCmd(s Shell, cmd string, args []string) {
 	case "exit":
 		ExitCmd()
 	case "type":
-		TypeCmd(s, cmd)
+		TypeCmd(s, args)
 	case "echo":
 		EchoCmd(s, args)
 	case "pwd":
