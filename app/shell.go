@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"slices"
 	"strings"
+  "github.com/chzyer/readline"
 
 	"github.com/codecrafters-io/shell-starter-go/app/command"
 	"github.com/codecrafters-io/shell-starter-go/app/redirection"
@@ -16,7 +16,7 @@ import (
 var delimiter = []byte{'"', '\''}
 
 type Shell struct {
-	reader    *bufio.Reader
+	reader    *readline.Instance
 	pathList  []string
 	wDir      string
 	stdin     io.Reader
@@ -33,10 +33,15 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		fmt.Print("error gathering the working directory")
 		os.Exit(1)
 	}
+  rl, err := readline.New("$ ")
+  if err != nil {
+		fmt.Print("error creating readline")
+		os.Exit(1)
+  }
 
 	pathList := strings.Split(pathEnv, string(os.PathListSeparator))
 	return &Shell{
-		reader:    bufio.NewReader(os.Stdin),
+		reader:    rl,
 		pathList:  pathList,
 		wDir:      dir,
 		stdin:     stdin,
@@ -97,7 +102,7 @@ func getCommand(s *Shell) (string, []string, error) {
 	var args []string
 	var err error
 
-	line, err := s.reader.ReadString('\n')
+	line, err := s.reader.Readline()
 	if err != nil {
 		return cmd, args, err
 	}
