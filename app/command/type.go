@@ -16,14 +16,14 @@ func TypeCmd(s Shell, args []string) {
 
 	// Built-in Function
 	if ok := slices.Contains(builtinCommands, cmd); ok {
-		display(s, fmt.Sprintln("%s is a shell builtin\n", cmd))
+		display(s, fmt.Sprintf("%s is a shell builtin\n", cmd))
 		return
 	}
 
 	// Function Found in PATH
 	cmdPath, isExec := CmdPath(cmd, pathList)
 	if isExec {
-		display(s, fmt.Sprintln("%s is %s\n", cmd, cmdPath))
+		display(s, fmt.Sprintf("%s is %s\n", cmd, cmdPath))
 		return
 	}
 
