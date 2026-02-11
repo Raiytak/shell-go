@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"os/exec"
 	"slices"
@@ -16,6 +17,17 @@ type Shell interface {
 	GetStderr() io.Writer
 	SetStdout(io.Writer)
 	SetStderr(io.Writer)
+	History() []string
+	UpdateHistory(string)
+}
+
+var builtinCommands = []string{
+	"echo",
+	"exit",
+	"type",
+	"pwd",
+	"cd",
+  "history",
 }
 
 // Other functions
@@ -32,14 +44,20 @@ func joinArgs(args []string) string {
 }
 
 func RunCommand(s Shell, cmd string, args []string) {
-	if isBuiltin(cmd) {
+
+	command := strings.Join(append([]string{cmd}, args...), " ")
+	cmdPath, isExec := CmdPath(cmd, s.PathList())
+	switch {
+	case isBuiltin(cmd):
 		execBuiltinCmd(s, cmd, args)
-		return
-	} else if cmdPath, ok := CmdPath(cmd, s.PathList()); ok {
+		s.UpdateHistory(command)
+	case isExec:
 		execCmd(s, cmd, cmdPath, args)
-	} else {
+		s.UpdateHistory(command)
+	default:
 		fmt.Printf("%s: command not found\n", cmd)
 	}
+	return
 }
 
 func isBuiltin(cmd string) bool {
@@ -58,6 +76,8 @@ func execBuiltinCmd(s Shell, cmd string, args []string) {
 		PwdCmd(s, args)
 	case "cd":
 		CdCmd(s, args)
+	case "history":
+		HistoryCmd(s)
 	default:
 		fmt.Printf("%s: command not found\n", cmd)
 	}

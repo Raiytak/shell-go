@@ -17,6 +17,7 @@ type Shell struct {
 	wDir     string
 	stdout   io.Writer
 	stderr   io.Writer
+	history  []string
 }
 
 func NewShell() *Shell {
@@ -34,6 +35,7 @@ func NewShell() *Shell {
 		wDir:     dir,
 		stdout:   os.Stdout,
 		stderr:   os.Stderr,
+		history:  []string{},
 	}
 }
 
@@ -106,4 +108,12 @@ func closeFiles(openFiles []*os.File) {
 		file.Close()
 	}
 	openFiles = []*os.File{}
+}
+
+func (s *Shell) History() []string {
+	return s.history
+}
+
+func (s *Shell) UpdateHistory(command string) {
+	s.history = append(s.history, command)
 }

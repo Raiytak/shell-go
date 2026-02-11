@@ -24,36 +24,36 @@ func SetRedirection(s Shell, args []string, openFiles []*os.File) []string {
 	var f *os.File
 	fStdout := []*os.File{}
 	fStderr := []*os.File{}
-  stdoutRedirected, stderrRedirected := false, false
+	stdoutRedirected, stderrRedirected := false, false
 	for {
 		if hasRedirection(args) {
 			symbol, filePath := args[len(args)-2], args[len(args)-1]
 			if isStdoutRedirection(symbol) {
 				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
 				fStdout = append(fStdout, f)
-        stdoutRedirected = true
+				stdoutRedirected = true
 			} else if isStderrRedirection(symbol) {
 				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
 				fStderr = append(fStderr, f)
-        stderrRedirected = true
+				stderrRedirected = true
 			} else if isStdoutAppend(symbol) {
 				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
 				fStdout = append(fStdout, f)
-        stdoutRedirected = true
+				stdoutRedirected = true
 			} else if isStderrAppend(symbol) {
 				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
 				fStderr = append(fStderr, f)
-        stderrRedirected = true
+				stderrRedirected = true
 			}
 			openFiles = append(openFiles, f)
 			args = slices.Delete(args, len(args)-2, len(args))
 		} else {
-      if !stdoutRedirected {
-        fStdout = append(fStdout, os.Stdout)
-      }
-      if !stderrRedirected {
-        fStderr = append(fStderr, os.Stderr)
-      }
+			if !stdoutRedirected {
+				fStdout = append(fStdout, os.Stdout)
+			}
+			if !stderrRedirected {
+				fStderr = append(fStderr, os.Stderr)
+			}
 			setStdout(s, fStdout)
 			setStderr(s, fStderr)
 			return args

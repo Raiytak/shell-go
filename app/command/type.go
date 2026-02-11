@@ -5,14 +5,6 @@ import (
 	"slices"
 )
 
-var builtinCommands = []string{
-	"echo",
-	"exit",
-	"type",
-	"pwd",
-	"cd",
-}
-
 func TypeCmd(s Shell, args []string) {
 	if len(args) == 0 {
 		fmt.Println(": not found")
