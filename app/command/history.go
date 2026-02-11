@@ -36,7 +36,7 @@ func limitHistory(history []string, limit string) (stdout []string, stderr []str
 		return stdout, []string{fmt.Sprintf("%s: argument not handled", limit)}
 	}
 
-	start := len(history) - l + 1
+	start := len(history) - l
 	if start < 0 {
 		start = 0
 	}
