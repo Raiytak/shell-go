@@ -1,9 +1,5 @@
 package command
 
-import (
-	"fmt"
-)
-
 func PwdCmd(s Shell, args []string) {
 	var lines []string
 	if len(args) != 0 {

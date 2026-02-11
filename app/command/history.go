@@ -31,7 +31,7 @@ func completeHistory(history []string) []string {
 	for i, h := range history {
 		lines = append(lines, fmt.Sprintf("    %d  %s", i+1, h))
 	}
-	lines = append(lines, fmt.Sprintf("    %d  history", len(history) + 1))
+	lines = append(lines, fmt.Sprintf("    %d  history", len(history)+1))
 	return lines
 }
 
@@ -42,13 +42,13 @@ func limitHistory(history []string, limit string) ([]string, error) {
 		return lines, errors.New(fmt.Sprintf("%s: argument not handled", limit))
 	}
 
-  start := len(history) - l + 1
-  if start < 0 {
-    start = 0
-  }
+	start := len(history) - l + 1
+	if start < 0 {
+		start = 0
+	}
 	for i := start; i < len(history); i++ {
 		lines = append(lines, fmt.Sprintf("    %d  %s", i+1, history[i]))
 	}
-	lines = append(lines, fmt.Sprintf("    %d  history %d", len(history) + 1, l))
+	lines = append(lines, fmt.Sprintf("    %d  history %d", len(history)+1, l))
 	return lines, nil
 }
