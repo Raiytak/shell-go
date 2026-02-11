@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 )
@@ -66,9 +65,9 @@ func readHistory(s Shell, filename string) (stderr []string) {
 	content := string(data)
 	history := strings.Split(content, "\n")
 	for _, line := range history {
-    if line != "" {
-      s.UpdateHistory(line)
-    }
+		if line != "" {
+			s.UpdateHistory(line)
+		}
 	}
 	return stderr
 }
