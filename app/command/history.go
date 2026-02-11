@@ -3,10 +3,10 @@ package command
 import "fmt"
 
 func HistoryCmd(s Shell) {
-  history := s.History()
-	fmt.Print("history\n")
+	history := s.History()
+	display(s, fmt.Sprintf("history\n"))
 	for i, h := range history {
-		fmt.Printf("    %d  %s\n", i, h)
+		display(s, fmt.Sprintf("    %d  %s\n", i, h))
 	}
 	return
 }

@@ -7,7 +7,7 @@ import (
 
 func TypeCmd(s Shell, args []string) {
 	if len(args) == 0 {
-		fmt.Println(": not found")
+		display(s, fmt.Sprintln(": not found\n"))
 		return
 	}
 
@@ -16,16 +16,16 @@ func TypeCmd(s Shell, args []string) {
 
 	// Built-in Function
 	if ok := slices.Contains(builtinCommands, cmd); ok {
-		fmt.Printf("%s is a shell builtin\n", cmd)
+		display(s, fmt.Sprintln("%s is a shell builtin\n", cmd))
 		return
 	}
 
 	// Function Found in PATH
 	cmdPath, isExec := CmdPath(cmd, pathList)
 	if isExec {
-		fmt.Printf("%s is %s\n", cmd, cmdPath)
+		display(s, fmt.Sprintln("%s is %s\n", cmd, cmdPath))
 		return
 	}
 
-	fmt.Printf("%s: not found\n", cmd)
+	display(s, fmt.Sprintf(": not found\n", cmd))
 }

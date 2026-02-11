@@ -28,25 +28,26 @@ func SetRedirection(s Shell, args []string, openFiles []*os.File) []string {
 	for {
 		if hasRedirection(args) {
 			symbol, filePath := args[len(args)-2], args[len(args)-1]
-			if isStdoutRedirection(symbol) {
+			switch {
+			case isStdoutRedirection(symbol):
 				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
 				fStdout = append(fStdout, f)
 				stdoutRedirected = true
-			} else if isStderrRedirection(symbol) {
+			case isStderrRedirection(symbol):
 				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
 				fStderr = append(fStderr, f)
 				stderrRedirected = true
-			} else if isStdoutAppend(symbol) {
+			case isStdoutAppend(symbol):
 				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
 				fStdout = append(fStdout, f)
 				stdoutRedirected = true
-			} else if isStderrAppend(symbol) {
+			case isStderrAppend(symbol):
 				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
 				fStderr = append(fStderr, f)
 				stderrRedirected = true
 			}
-			openFiles = append(openFiles, f)
 			args = slices.Delete(args, len(args)-2, len(args))
+			openFiles = append(openFiles, f)
 		} else {
 			if !stdoutRedirected {
 				fStdout = append(fStdout, os.Stdout)

@@ -27,7 +27,7 @@ var builtinCommands = []string{
 	"type",
 	"pwd",
 	"cd",
-  "history",
+	"history",
 }
 
 // Other functions
@@ -71,7 +71,7 @@ func execBuiltinCmd(s Shell, cmd string, args []string) {
 	case "type":
 		TypeCmd(s, args)
 	case "echo":
-		EchoCmd(args)
+		EchoCmd(s, args)
 	case "pwd":
 		PwdCmd(s, args)
 	case "cd":
@@ -90,4 +90,11 @@ func execCmd(s Shell, cmd string, cmdPath string, args []string) {
 	eCmd.Stderr = s.GetStderr()
 	eCmd.Run()
 	return
+}
+
+func display(s Shell, line string) {
+	_, err := fmt.Fprintln(s.GetStdout(), line)
+	if err != nil {
+		panic(err)
+	}
 }

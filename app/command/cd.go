@@ -23,12 +23,12 @@ func CdCmd(s Shell, args []string) {
 	}
 	_, err := os.Stat(wDir)
 	if err != nil {
-		fmt.Printf("cd: %s: No such file or directory\n", wDir)
+		display(s, fmt.Sprintf("cd: %s: No such file or directory\n", wDir))
 		return
 	}
 	err = os.Chdir(wDir)
 	if err != nil {
-		fmt.Print("error while changing directory")
+		display(s, fmt.Sprintf("error while changing directory"))
 	}
 	s.SetWorkingDir(wDir)
 }

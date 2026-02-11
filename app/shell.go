@@ -2,14 +2,18 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/codecrafters-io/shell-starter-go/app/command"
 	"github.com/codecrafters-io/shell-starter-go/app/redirection"
 )
+
+var delimiter = []byte{'"', '\''}
 
 type Shell struct {
 	reader   *bufio.Reader
@@ -48,9 +52,9 @@ func (s *Shell) Run() {
 		s.SetStderr(stderr)
 		fmt.Print("$ ")
 
-		cmd, args, err := processUserInput(s)
+		cmd, args, err := getCommand(s)
 		if err != nil {
-			fmt.Printf("error processing: %s %s", cmd, args)
+			fmt.Printf("error processing: %s %s\n", cmd, args)
 			continue
 		}
 
@@ -77,18 +81,60 @@ func (s *Shell) GetStderr() io.Writer {
 	return s.stderr
 }
 
-func processUserInput(s *Shell) (cmd string, args []string, err error) {
+func getCommand(s *Shell) (string, []string, error) {
+	var cmd string
+	var args []string
+	var err error
+
 	line, err := s.reader.ReadString('\n')
 	if err != nil {
-		return
+		return cmd, args, err
 	}
 
-	fields := strings.Fields(line)
+	fields, err := tokenize(line)
+	if err != nil {
+		return cmd, args, err
+	}
+
 	cmd = fields[0]
 	if len(fields) > 1 {
 		args = fields[1:]
 	}
-	return
+	return cmd, args, err
+}
+
+func tokenize(line string) ([]string, error) {
+	var fields []string
+	var token string
+	var d byte
+
+	cleanedLine := strings.Join(strings.Fields(line), " ")
+	for i := 0; i < len(cleanedLine); i++ {
+		b := cleanedLine[i]
+		switch {
+		case (b == d || (b == ' ' && d == 0)):
+			fields = append(fields, token)
+			d = 0
+			token = ""
+		case (d == 0 && isDelimiter(b)):
+			d = b
+		case i == len(cleanedLine)-1:
+			if b != '\n' {
+				token += string(b)
+			}
+			fields = append(fields, token)
+		default:
+			token += string(b)
+		}
+	}
+	if d != 0 {
+		return []string{}, errors.New("unclosed quote\n")
+	}
+	return fields, nil
+}
+
+func isDelimiter(c byte) bool {
+	return slices.Contains(delimiter, c)
 }
 
 func (s *Shell) WorkingDir() string {
