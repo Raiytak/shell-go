@@ -8,6 +8,6 @@ func HistoryCmd(s Shell) {
 	for i, h := range history {
 		display(s, fmt.Sprintf("    %d  %s", i+1, h))
 	}
-  display(fmt.Sprintf(s, "    %d  history", len(history)))
+  display(s, fmt.Sprintf("    %d  history", len(history)))
 	return
 }
