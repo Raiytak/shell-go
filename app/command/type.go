@@ -5,13 +5,7 @@ import (
 	"slices"
 )
 
-func TypeCmd(s Shell, args []string) {
-	if len(args) == 0 {
-		display(s, fmt.Sprintln(": not found"))
-		return
-	}
-
-	cmd := args[0]
+func TypeCmd(s Shell, cmd string) {
 	pathList := s.PathList()
 
 	// Built-in Function
@@ -27,5 +21,5 @@ func TypeCmd(s Shell, args []string) {
 		return
 	}
 
-	display(s, fmt.Sprintf(": not found", cmd))
+	display(s, fmt.Sprintf("%s: not found", cmd))
 }
