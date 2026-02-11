@@ -2,9 +2,10 @@ package command
 
 import (
 	"fmt"
+	"os"
+	"slices"
 	"strconv"
 	"strings"
-  "os"
 )
 
 func HistoryCmd(s Shell, args []string) (stdout []string, stderr []string) {
@@ -25,8 +26,10 @@ func HistoryCmd(s Shell, args []string) (stdout []string, stderr []string) {
 	return stdout, stderr
 }
 
-func completeHistory(history []string) ([]string, []string) {
-	return getHistory(history, 0, "history")
+func completeHistory(history []string) (stdout []string, stderr []string) {
+	stdout, stderr = getHistory(history, 0)
+	stdout = append(stdout, fmt.Sprintf("    %d  %s", len(history)+1, "history"))
+	return stdout, stderr
 }
 
 func limitHistory(history []string, limit string) (stdout []string, stderr []string) {
@@ -39,7 +42,9 @@ func limitHistory(history []string, limit string) (stdout []string, stderr []str
 	if start < 0 {
 		start = 0
 	}
-	return getHistory(history, start, fmt.Sprintf("history %d", limit))
+	stdout, stderr = getHistory(history, start)
+	stdout = append(stdout, fmt.Sprintf("    %d  %s", len(history)+1, fmt.Sprintf("history %d", limit)))
+	return stdout, stderr
 }
 
 func historyPersistence(s Shell, action string, filename string) (stdout []string, stderr []string) {
@@ -61,7 +66,8 @@ func readHistory(s Shell, filename string) (stderr []string) {
 	}
 
 	content := string(data)
-  history := strings.Split(content, "\n")
+	history := strings.Split(content, "\n")
+	history = slices.Insert(history, 0, fmt.Sprintf("history -r %s", filename))
 	for _, line := range history {
 		s.UpdateHistory(line)
 	}
@@ -71,24 +77,23 @@ func readHistory(s Shell, filename string) (stderr []string) {
 func writeHistory(s Shell, filename string, flag int) (stderr []string) {
 	f, err := os.OpenFile(filename, flag, 0644)
 	if err != nil {
-    return []string{fmt.Sprintf("error opening file: %s", filename)}
+		return []string{fmt.Sprintf("error opening file: %s", filename)}
 	}
 	defer f.Close()
 
 	_, err = f.WriteString(strings.Join(s.History(), "\n"))
 	if err != nil {
-    return []string{fmt.Sprintf("error writing file: %s", filename)}
+		return []string{fmt.Sprintf("error writing file: %s", filename)}
 	}
 	return stderr
 }
 
-func getHistory(history []string, start int, cmd string) (stdout []string, stderr []string) {
+func getHistory(history []string, start int) (stdout []string, stderr []string) {
 	if start < 0 || len(history) < start {
 		return stdout, []string{"no such event"}
 	}
 	for i := start; i < len(history); i++ {
 		stdout = append(stdout, fmt.Sprintf("    %d  %s", i+1, history[i]))
 	}
-	stdout = append(stdout, fmt.Sprintf("    %d  %s", len(history)+1, cmd))
 	return stdout, stderr
 }
