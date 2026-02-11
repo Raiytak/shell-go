@@ -23,7 +23,7 @@ func CdCmd(s Shell, args []string) {
 	}
 	_, err := os.Stat(wDir)
 	if err != nil {
-		display(s, fmt.Sprintf("cd: %s: No such file or directory\n", wDir))
+		display(s, fmt.Sprintf("cd: %s: No such file or directory", wDir))
 		return
 	}
 	err = os.Chdir(wDir)
