@@ -1,5 +1,3 @@
 package command
 
-import "test"
-
-func Test
+//func Test

@@ -29,22 +29,22 @@ func SetRedirection(s Shell, args []string) []string {
 	stdoutRedirected, stderrRedirected := false, false
 	for {
 		if hasRedirection(args) {
-			symbol, filePath := args[len(args)-2], args[len(args)-1]
+			symbol, filename := args[len(args)-2], args[len(args)-1]
 			switch {
 			case isStdoutRedirection(symbol):
-				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
+				f = openFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
 				fStdout = append(fStdout, f)
 				stdoutRedirected = true
 			case isStderrRedirection(symbol):
-				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
+				f = openFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
 				fStderr = append(fStderr, f)
 				stderrRedirected = true
 			case isStdoutAppend(symbol):
-				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
+				f = openFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
 				fStdout = append(fStdout, f)
 				stdoutRedirected = true
 			case isStderrAppend(symbol):
-				f = openFile(filePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
+				f = openFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
 				fStderr = append(fStderr, f)
 				stderrRedirected = true
 			}
@@ -65,8 +65,8 @@ func SetRedirection(s Shell, args []string) []string {
 	}
 }
 
-func openFile(filePath string, flag int) *os.File {
-	f, err := os.OpenFile(filePath, flag, 0644)
+func openFile(filename string, flag int) *os.File {
+	f, err := os.OpenFile(filename, flag, 0644)
 	if err != nil {
 		panic(err)
 	}
