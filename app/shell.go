@@ -40,9 +40,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		fmt.Print("error creating readline\n")
 		os.Exit(1)
 	}
-	history = slices.DeleteFunc(history, func(s string) bool {
-		return (s == "\n" || s == "")
-	})
+	history = slices.DeleteFunc(history, command.EmptyLine)
 
 	pathList := strings.Split(pathEnv, string(os.PathListSeparator))
 	return &Shell{

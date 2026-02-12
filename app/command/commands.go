@@ -91,3 +91,7 @@ func execCmd(s Shell, cmd string, cmdPath string, args []string) (stdout []strin
 	eCmd.Run()
 	return stdout, stderr
 }
+
+func EmtpyLine(s string) bool {
+  return (s == "\n" || s == "")
+}

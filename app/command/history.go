@@ -77,6 +77,9 @@ func ReadHistory(filename string) (lines []string, err error) {
 	}
 	content := string(data)
 	lines = strings.Split(content, "\n")
+	lines = slices.DeleteFunc(lines, command.EmptyLine)
+		return (s == "\n" || s == "")
+  })
 	return lines, err
 }
 
