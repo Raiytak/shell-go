@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -77,9 +78,7 @@ func ReadHistory(filename string) (lines []string, err error) {
 	}
 	content := string(data)
 	lines = strings.Split(content, "\n")
-	lines = slices.DeleteFunc(lines, command.EmptyLine)
-		return (s == "\n" || s == "")
-  })
+	lines = slices.DeleteFunc(lines, EmptyLine)
 	return lines, err
 }
 

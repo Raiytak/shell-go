@@ -92,6 +92,6 @@ func execCmd(s Shell, cmd string, cmdPath string, args []string) (stdout []strin
 	return stdout, stderr
 }
 
-func EmtpyLine(s string) bool {
-  return (s == "\n" || s == "")
+func EmptyLine(s string) bool {
+	return (s == "\n" || s == "")
 }
