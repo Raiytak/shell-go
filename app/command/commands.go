@@ -66,7 +66,7 @@ func isBuiltin(cmd string) bool {
 func execBuiltinCmd(s Shell, cmd string, args []string) (stdout []string, stderr []string) {
 	switch cmd {
 	case "exit":
-		ExitCmd()
+		ExitCmd(s)
 	case "type":
 		stdout, stderr = TypeCmd(s, args)
 	case "echo":

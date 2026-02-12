@@ -59,7 +59,6 @@ func (s *Shell) Run() {
 	defaultStdout := s.stdout
 	defaultStderr := s.stderr
 	defer closeFiles(s)
-  defer command.HistoryCmd(s, []string{"-w ", os.Getenv("HISTFILE")})
 
 	for {
 		s.SetStdout(defaultStdout)
