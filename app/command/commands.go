@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"os/exec"
@@ -94,4 +95,12 @@ func execCmd(s Shell, cmd string, cmdPath string, args []string) (stdout []strin
 
 func EmptyLine(s string) bool {
 	return (s == "\n" || s == "")
+}
+
+func EnsureFileExists(path string) error {
+	file, err := os.OpenFile(path, os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	return file.Close()
 }

@@ -79,7 +79,7 @@ func ReadHistory(filename string) (lines []string) {
 }
 
 func writeHistory(s Shell, filename string) (stderr []string) {
-	return saveHistory(filename, s.History())
+	return saveLines(filename, s.History())
 }
 
 func appendHistory(s Shell, filename string) (stderr []string) {
@@ -92,10 +92,10 @@ func appendHistory(s Shell, filename string) (stderr []string) {
 	for _, l := range s.History() {
 		lines = append(lines, l)
 	}
-	return saveHistory(filename, lines)
+	return saveLines(filename, lines)
 }
 
-func saveHistory(filename string, lines []string) (stderr []string) {
+func saveLines(filename string, lines []string) (stderr []string) {
 	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
 	if err != nil {
 		return []string{fmt.Sprintf("error opening file: %s", filename)}

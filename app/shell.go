@@ -24,6 +24,7 @@ type Shell struct {
 	stdout    io.Writer
 	stderr    io.Writer
 	history   []string
+	histFile  string
 	openFiles []*os.File
 }
 
@@ -35,7 +36,12 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		os.Exit(1)
 	}
 	reader, err := readline.New("$ ")
-	history := command.ReadHistory(os.Getenv("HISTFILE"))
+	histFile := os.Getenv("HISTFILE")
+	err = command.EnsureFileExists(histFile)
+	if err != nil {
+		panic(err)
+	}
+	history := command.ReadHistory(histFile)
 	history = slices.DeleteFunc(history, command.EmptyLine)
 
 	pathList := strings.Split(pathEnv, string(os.PathListSeparator))
@@ -47,6 +53,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		stdout:    stdout,
 		stderr:    stderr,
 		history:   history,
+		histFile:  histFile,
 		openFiles: []*os.File{},
 	}
 }
