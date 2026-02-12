@@ -36,7 +36,10 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		os.Exit(1)
 	}
 	reader, err := readline.New("$ ")
-	histFile := os.Getenv("HISTFILE")
+  histFile := os.Getenv("HISTFILE")
+  if histFile == "" {
+    histFile = ".bash_history"
+  }
 	err = command.EnsureFileExists(histFile)
 	if err != nil {
 		panic(err)
@@ -200,6 +203,10 @@ func (s *Shell) GetOpenFiles() []*os.File {
 
 func (s *Shell) SetOpenFiles(openFiles []*os.File) {
 	s.openFiles = openFiles
+}
+
+func (s *Shell) GetHistoryFile() string {
+  return s.histFile
 }
 
 func display(s *Shell, stdout []string, stderr []string) (err error) {

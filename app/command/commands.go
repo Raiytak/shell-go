@@ -21,6 +21,7 @@ type Shell interface {
 	History() []string
 	UpdateHistory(string)
 	ResetHistory()
+  GetHistoryFile() string
 }
 
 var builtinCommands = []string{

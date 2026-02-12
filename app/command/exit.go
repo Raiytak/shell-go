@@ -5,6 +5,6 @@ import (
 )
 
 func ExitCmd(s Shell) {
-	writeHistory(s, os.Getenv("HISTFILE"))
+	writeHistory(s, s.GetHistoryFile())
 	os.Exit(0)
 }
