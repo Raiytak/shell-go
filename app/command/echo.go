@@ -4,6 +4,6 @@ import (
 	"strings"
 )
 
-func EchoCmd(args []string) ([]string, []string) {
+func EchoCmd(_ Shell, args []string) ([]string, []string) {
 	return []string{strings.Join(args, " ")}, []string{}
 }

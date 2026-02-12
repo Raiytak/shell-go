@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-func CdCmd(s Shell, args []string) (stderr []string) {
-	dir := strings.Join(args, "/")
-	if len(dir) == 0 {
+func CdCmd(s Shell, args []string) (stdout []string, stderr []string) {
+	if len(args) == 0 {
 		return
 	}
 
+	dir := strings.Join(args, "/")
 	wDir := ""
 	if dir[0] == '/' {
 		wDir = dir
@@ -23,12 +23,12 @@ func CdCmd(s Shell, args []string) (stderr []string) {
 	}
 	_, err := os.Stat(wDir)
 	if err != nil {
-		return []string{fmt.Sprintf("cd: %s: No such file or directory", wDir)}
+		return stdout, []string{fmt.Sprintf("cd: %s: No such file or directory", wDir)}
 	}
 	err = os.Chdir(wDir)
 	if err != nil {
-		return []string{fmt.Sprintf("error while changing directory")}
+		return stdout, []string{fmt.Sprintf("error while changing directory")}
 	}
 	s.SetWorkingDir(wDir)
-	return stderr
+	return stdout, stderr
 }

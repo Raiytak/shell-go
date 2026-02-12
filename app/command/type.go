@@ -2,7 +2,6 @@ package command
 
 import (
 	"fmt"
-	"slices"
 )
 
 func TypeCmd(s Shell, args []string) (stdout []string, stderr []string) {
@@ -14,12 +13,12 @@ func TypeCmd(s Shell, args []string) (stdout []string, stderr []string) {
 	pathList := s.PathList()
 
 	// Built-in Function
-	if ok := slices.Contains(builtinCommands, cmd); ok {
+	if s.IsBuiltin(cmd) {
 		return []string{fmt.Sprintf("%s is a shell builtin", cmd)}, stderr
 	}
 
 	// Function Found in PATH
-	cmdPath, isExec := CmdPath(cmd, pathList)
+	cmdPath, isExec := findCommand(cmd, pathList)
 	if isExec {
 		return []string{fmt.Sprintf("%s is %s", cmd, cmdPath)}, stderr
 	}

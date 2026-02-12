@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"os/exec"
-	"slices"
 )
 
 type Shell interface {
@@ -21,17 +20,12 @@ type Shell interface {
 	History() []string
 	UpdateHistory(string)
 	ResetHistory()
-  GetHistoryFile() string
+	GetHistoryFile() string
+	IsBuiltin(string) bool
+	Commands() map[string]Command
 }
 
-var builtinCommands = []string{
-	"echo",
-	"exit",
-	"type",
-	"pwd",
-	"cd",
-	"history",
-}
+type Command func(s Shell, args []string) (stdout []string, stderr []string)
 
 // Other functions
 func joinArgs(args []string) string {
@@ -48,12 +42,13 @@ func joinArgs(args []string) string {
 
 func RunCommand(s Shell, cmd string, args []string) (stdout []string, stderr []string) {
 	command := strings.Join(append([]string{cmd}, args...), " ")
-	cmdPath, isExec := CmdPath(cmd, s.PathList())
 	s.UpdateHistory(command)
+
+	cmdPath, cmdFound := findCommand(cmd, s.PathList())
 	switch {
-	case isBuiltin(cmd):
+	case s.IsBuiltin(cmd):
 		stdout, stderr = execBuiltinCmd(s, cmd, args)
-	case isExec:
+	case cmdFound:
 		stdout, stderr = execCmd(s, cmd, cmdPath, args)
 	default:
 		stderr = []string{fmt.Sprintf("%s: command not found", cmd)}
@@ -61,28 +56,12 @@ func RunCommand(s Shell, cmd string, args []string) (stdout []string, stderr []s
 	return stdout, stderr
 }
 
-func isBuiltin(cmd string) bool {
-	return slices.Contains(builtinCommands, cmd)
-}
-
 func execBuiltinCmd(s Shell, cmd string, args []string) (stdout []string, stderr []string) {
-	switch cmd {
-	case "exit":
-		ExitCmd(s)
-	case "type":
-		stdout, stderr = TypeCmd(s, args)
-	case "echo":
-		stdout, stderr = EchoCmd(args)
-	case "pwd":
-		stdout, stderr = PwdCmd(s, args)
-	case "cd":
-		stderr = CdCmd(s, args)
-	case "history":
-		stdout, stderr = HistoryCmd(s, args)
-	default:
-		stderr = []string{fmt.Sprintf("%s: command not found", cmd)}
+	command, ok := s.Commands()[cmd]
+	if !ok {
+		return stdout, []string{fmt.Sprintf("no builtin command %s", cmd)}
 	}
-	return stdout, stderr
+	return command(s, args)
 }
 
 func execCmd(s Shell, cmd string, cmdPath string, args []string) (stdout []string, stderr []string) {

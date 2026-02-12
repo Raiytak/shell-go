@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-func CmdPath(cmd string, pathList []string) (string, bool) {
+func findCommand(cmd string, pathList []string) (string, bool) {
 	for _, dir := range pathList {
 		fullPath := filepath.Join(dir, cmd)
 

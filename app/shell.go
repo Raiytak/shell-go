@@ -20,6 +20,7 @@ type Shell struct {
 	reader    *readline.Instance
 	pathList  []string
 	wDir      string
+	commands  map[string]command.Command
 	stdin     io.Reader
 	stdout    io.Writer
 	stderr    io.Writer
@@ -36,10 +37,20 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		os.Exit(1)
 	}
 	reader, err := readline.New("$ ")
-  histFile := os.Getenv("HISTFILE")
-  if histFile == "" {
-    histFile = ".bash_history"
-  }
+
+	commands := map[string]command.Command{
+		"echo":    command.EchoCmd,
+		"exit":    command.ExitCmd,
+		"type":    command.TypeCmd,
+		"pwd":     command.PwdCmd,
+		"cd":      command.CdCmd,
+		"history": command.HistoryCmd,
+	}
+
+	histFile := os.Getenv("HISTFILE")
+	if histFile == "" {
+		histFile = ".bash_history"
+	}
 	err = command.EnsureFileExists(histFile)
 	if err != nil {
 		panic(err)
@@ -52,6 +63,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		reader:    reader,
 		pathList:  pathList,
 		wDir:      dir,
+		commands:  commands,
 		stdin:     stdin,
 		stdout:    stdout,
 		stderr:    stderr,
@@ -206,7 +218,16 @@ func (s *Shell) SetOpenFiles(openFiles []*os.File) {
 }
 
 func (s *Shell) GetHistoryFile() string {
-  return s.histFile
+	return s.histFile
+}
+
+func (s *Shell) IsBuiltin(cmd string) bool {
+	_, ok := s.commands[cmd]
+	return ok
+}
+
+func (s *Shell) Commands() map[string]command.Command {
+	return s.commands
 }
 
 func display(s *Shell, stdout []string, stderr []string) (err error) {
