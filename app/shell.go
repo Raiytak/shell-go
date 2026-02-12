@@ -37,8 +37,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 	rl, err := readline.New("$ ")
 	history, err := command.ReadHistory(os.Getenv("HISTFILE"))
 	if err != nil {
-		fmt.Print("error creating readline\n")
-		os.Exit(1)
+		history = []string{}
 	}
 	history = slices.DeleteFunc(history, command.EmptyLine)
 
