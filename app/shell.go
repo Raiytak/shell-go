@@ -40,6 +40,9 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		fmt.Print("error creating readline\n")
 		os.Exit(1)
 	}
+  history = slices.DeleteFunc(slices, func(s string) bool {
+    return (s == "\n" || s == "")
+  })
 
 	pathList := strings.Split(pathEnv, string(os.PathListSeparator))
 	return &Shell{
@@ -183,9 +186,7 @@ func (s *Shell) History() []string {
 }
 
 func (s *Shell) UpdateHistory(line string) {
-	if (line != "" && line != "\n") {
-		s.history = append(s.history, line)
-	}
+  s.history = append(s.history, line)
 }
 
 func (s *Shell) ResetHistory() {
@@ -218,4 +219,8 @@ func display(s *Shell, stdout []string, stderr []string) (err error) {
 		}
 	}
 	return err
+}
+
+func noEmptyLine(line []string) []string {
+
 }
