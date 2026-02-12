@@ -34,16 +34,13 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		fmt.Print("error gathering the working directory")
 		os.Exit(1)
 	}
-	rl, err := readline.New("$ ")
-	history, err := command.ReadHistory(os.Getenv("HISTFILE"))
-	if err != nil {
-		history = []string{}
-	}
+	reader, err := readline.New("$ ")
+	history := command.ReadHistory(os.Getenv("HISTFILE"))
 	history = slices.DeleteFunc(history, command.EmptyLine)
 
 	pathList := strings.Split(pathEnv, string(os.PathListSeparator))
 	return &Shell{
-		reader:    rl,
+		reader:    reader,
 		pathList:  pathList,
 		wDir:      dir,
 		stdin:     stdin,

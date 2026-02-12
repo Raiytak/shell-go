@@ -1,8 +1,11 @@
 package command
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 func ExitCmd(s Shell) {
-  appendHistory(s, os.Getenv("HISTFILE"))
+	fmt.Print(appendHistory(s, os.Getenv("HISTFILE")))
 	os.Exit(0)
 }

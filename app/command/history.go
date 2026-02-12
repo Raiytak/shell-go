@@ -1,7 +1,6 @@
 package command
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"slices"
@@ -61,25 +60,22 @@ func historyPersistence(s Shell, action string, filename string) (stdout []strin
 }
 
 func importHistory(s Shell, filename string) (stderr []string) {
-	lines, err := ReadHistory(filename)
-	if err != nil {
-		stderr = []string{"error reading history file"}
-	}
+	lines := ReadHistory(filename)
 	for _, line := range lines {
 		s.UpdateHistory(line)
 	}
 	return stderr
 }
 
-func ReadHistory(filename string) (lines []string, err error) {
+func ReadHistory(filename string) (lines []string) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return lines, errors.New("error opening file")
+		return lines
 	}
 	content := string(data)
 	lines = strings.Split(content, "\n")
 	lines = slices.DeleteFunc(lines, EmptyLine)
-	return lines, err
+	return lines
 }
 
 func writeHistory(s Shell, filename string) (stderr []string) {
