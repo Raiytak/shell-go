@@ -116,7 +116,7 @@ func getHistory(history []string, start int) (stdout []string, stderr []string) 
 		return stdout, []string{"no such event"}
 	}
 	for i := start; i < len(history); i++ {
-    stdout = append(stdout, fmt.Sprintf("    %d  %s", i+1, history[i]))
+		stdout = append(stdout, fmt.Sprintf("    %d  %s", i+1, history[i]))
 	}
 	return stdout, stderr
 }
