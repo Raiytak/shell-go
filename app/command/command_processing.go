@@ -31,9 +31,13 @@ func extractFields(line string) (fields []string, err error) {
 		b := cleanedLine[i]
 		switch {
 		case (b == d || (b == ' ' && d == 0)):
-			fields = append(fields, token)
-			d = 0
-			token = ""
+			if token != "" {
+				fields = append(fields, token)
+				d = 0
+				token = ""
+			} else {
+				token = ""
+			}
 		case (d == 0 && isDelimiter(b)):
 			d = b
 		case i == len(cleanedLine)-1:
