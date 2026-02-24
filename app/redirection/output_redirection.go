@@ -38,11 +38,11 @@ func SetRedirection(ctxCmd *context.Command, fields []string) (args []string, op
 				f, err = openFile(filename, truncFile)
 				var w io.Writer = f
 				fStderr = append(fStderr, w)
-			case "1>>":
+			case ">>", "1>>":
 				f, err = openFile(filename, appendFile)
 				var w io.Writer = f
 				fStdout = append(fStdout, w)
-			case "2>>", ">>":
+			case "2>>":
 				f, err = openFile(filename, appendFile)
 				var w io.Writer = f
 				fStderr = append(fStderr, w)
@@ -80,5 +80,5 @@ func RedirectedStdout(args []string) bool {
 }
 
 func RedirectedStderr(args []string) bool {
-	return slices.Contains(args, "2>")
+	return slices.Contains(args, "2>") || slices.Contains(args, ">>")
 }
