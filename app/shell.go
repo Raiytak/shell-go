@@ -29,7 +29,6 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 	if err != nil {
 		panic("error gathering the working directory")
 	}
-	os.Setenv("HISTFILE", "test_history")
 	histFile := os.Getenv("HISTFILE")
 	history, err := history.Initialize(histFile)
 	if err != nil {
