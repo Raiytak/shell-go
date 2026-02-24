@@ -3,7 +3,9 @@ package command
 import (
 	"errors"
 	"io"
+	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/codecrafters-io/shell-starter-go/app/context"
 	"github.com/codecrafters-io/shell-starter-go/app/history"
@@ -26,6 +28,9 @@ func (c History) Run(ctxSh *context.Shell, ctxCmd *context.Command, args []strin
 		action := args[0]
 		filename := args[1]
 		updatedHistory, err := history.Persist(ctxSh.History, action, filename)
+		if action == "-r" {
+			updatedHistory = slices.Insert(updatedHistory, 0, strings.Join(args, " "))
+		}
 		ctxSh.History = updatedHistory
 		if err != nil {
 			return err
