@@ -1,34 +1,35 @@
 package command
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/codecrafters-io/shell-starter-go/app/context"
 )
 
-func CdCmd(s Shell, args []string) (stdout []string, stderr []string) {
-	if len(args) == 0 {
-		return
-	}
+type Cd struct{}
 
-	dir := strings.Join(args, "/")
-	wDir := ""
-	if dir[0] == '/' {
-		wDir = dir
-	} else if dir[0] == '~' {
-		wDir = os.Getenv("HOME") + dir[1:]
-	} else {
-		wDir = path.Clean(path.Join(s.WorkingDir(), dir))
+func (c Cd) Run(ctx *context.Shell, _ *context.Command, args []string) error {
+	input := strings.Join(args, "/")
+	input = strings.ReplaceAll(input, "~", home())
+	var target string
+	switch {
+	case len(args) == 0:
+		target = home()
+	case input[0] == '/':
+		target = input
+	default:
+		target = path.Clean(path.Join(ctx.Dir, input))
 	}
-	_, err := os.Stat(wDir)
+	_, err := os.Stat(target)
 	if err != nil {
-		return stdout, []string{fmt.Sprintf("cd: %s: No such file or directory", wDir)}
+		return err
 	}
-	err = os.Chdir(wDir)
-	if err != nil {
-		return stdout, []string{fmt.Sprintf("error while changing directory")}
-	}
-	s.SetWorkingDir(wDir)
-	return stdout, stderr
+	ctx.Dir = target
+	return err
+}
+
+func home() string {
+	return os.Getenv("HOME")
 }

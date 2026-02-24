@@ -1,8 +1,18 @@
 package command
 
-func PwdCmd(s Shell, args []string) (stdout []string, stderr []string) {
+import (
+	"errors"
+	"io"
+
+	"github.com/codecrafters-io/shell-starter-go/app/context"
+)
+
+type Pwd struct{}
+
+func (c Pwd) Run(ctxSh *context.Shell, ctxCmd *context.Command, args []string) error {
 	if len(args) != 0 {
-		return stdout, []string{("pwd: too many arguments")}
+		return errors.New("too many arguments")
 	}
-	return []string{s.WorkingDir()}, stderr
+	io.WriteString(ctxCmd.Stdout, ctxSh.Dir+"\n")
+	return nil
 }

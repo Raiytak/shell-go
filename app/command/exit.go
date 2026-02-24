@@ -2,10 +2,13 @@ package command
 
 import (
 	"os"
+
+	"github.com/codecrafters-io/shell-starter-go/app/context"
 )
 
-func ExitCmd(s Shell, _ []string) (_ []string, _ []string) {
-	writeHistory(s, s.GetHistoryFile())
+type Exit struct{}
+
+func (c *Exit) Run(_ *context.Shell, _ *context.Command, _ []string) error {
 	os.Exit(0)
-	return
+	return nil
 }

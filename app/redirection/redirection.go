@@ -1,9 +1,9 @@
 package redirection
 
 import (
+	"fmt"
 	"io"
 	"os"
-	"slices"
 )
 
 type Shell interface {
@@ -12,110 +12,23 @@ type Shell interface {
 	PathList() []string
 	SetStdout(io.Writer)
 	SetStderr(io.Writer)
+	GetStdout() io.Writer
+	GetStderr() io.Writer
 	SetOpenFiles([]*os.File)
 }
 
-var redirectionSymbols = []string{">", "1>", "2>", ">>", "1>>", "2>>"}
-
-func SetRedirection(s Shell, args []string) []string {
-	var openFiles []*os.File
-	if len(args) <= 1 {
-		return args
+func Redirect(s Shell, stdout string, stderr string) (err error) {
+	var text string
+	var output io.Writer
+	if len(stdout) > 0 {
+		text = stdout
+		output = s.GetStdout()
+		_, err = fmt.Fprint(output, text)
 	}
-
-	var f *os.File
-	fStdout := []*os.File{}
-	fStderr := []*os.File{}
-	stdoutRedirected, stderrRedirected := false, false
-	for {
-		if hasRedirection(args) {
-			symbol, filename := args[len(args)-2], args[len(args)-1]
-			switch {
-			case isStdoutRedirection(symbol):
-				f = openFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
-				fStdout = append(fStdout, f)
-				stdoutRedirected = true
-			case isStderrRedirection(symbol):
-				f = openFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC)
-				fStderr = append(fStderr, f)
-				stderrRedirected = true
-			case isStdoutAppend(symbol):
-				f = openFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
-				fStdout = append(fStdout, f)
-				stdoutRedirected = true
-			case isStderrAppend(symbol):
-				f = openFile(filename, os.O_CREATE|os.O_WRONLY|os.O_APPEND)
-				fStderr = append(fStderr, f)
-				stderrRedirected = true
-			}
-			args = slices.Delete(args, len(args)-2, len(args))
-			openFiles = append(openFiles, f)
-		} else {
-			if !stdoutRedirected {
-				fStdout = append(fStdout, os.Stdout)
-			}
-			if !stderrRedirected {
-				fStderr = append(fStderr, os.Stderr)
-			}
-			setStdout(s, fStdout)
-			setStderr(s, fStderr)
-			s.SetOpenFiles(openFiles)
-			return args
-		}
+	if len(stderr) > 0 {
+		text = stderr
+		output = s.GetStderr()
+		_, err = fmt.Fprint(output, text)
 	}
-}
-
-func openFile(filename string, flag int) *os.File {
-	f, err := os.OpenFile(filename, flag, 0644)
-	if err != nil {
-		panic(err)
-	}
-	return f
-}
-
-func setStdout(s Shell, files []*os.File) {
-	writers := make([]io.Writer, 0, len(files))
-	for _, f := range files {
-		writers = append(writers, f)
-	}
-	w := io.MultiWriter(writers...)
-	s.SetStdout(w)
-}
-
-func setStderr(s Shell, files []*os.File) {
-	writers := make([]io.Writer, 0, len(files))
-	for _, f := range files {
-		writers = append(writers, f)
-	}
-	w := io.MultiWriter(writers...)
-	s.SetStderr(w)
-}
-
-func hasRedirection(args []string) bool {
-	if len(args) > 1 {
-		if isRedirectionSymbol(args[len(args)-2]) {
-			return true
-		}
-	}
-	return false
-}
-
-func isRedirectionSymbol(arg string) bool {
-	return slices.Contains(redirectionSymbols, arg)
-}
-
-func isStdoutRedirection(arg string) bool {
-	return (arg == ">" || arg == "1>")
-}
-
-func isStderrRedirection(arg string) bool {
-	return arg == "2>"
-}
-
-func isStdoutAppend(arg string) bool {
-	return (arg == ">>" || arg == "1>>")
-}
-
-func isStderrAppend(arg string) bool {
-	return arg == "2>>"
+	return err
 }
