@@ -65,7 +65,7 @@ func (s *Shell) Run() {
 
 		cmds := redirection.Subcommands(line)
 		if err := runPipeline(cmds, &s.Context); err != nil {
-			// io.WriteString(s.Context.Stderr, err.Error()+"\n")
+			io.WriteString(s.Context.Stderr, err.Error()+"\n")
 			continue
 		}
 	}
