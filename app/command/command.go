@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 	"fmt"
+	"io"
 
 	"os/exec"
 
@@ -40,7 +41,9 @@ func Run(name string, args []string, ctxSh *context.Shell, ctxCmd *context.Comma
 		cmd.Path = path
 		return runExecutable(cmd, ctxCmd)
 	default:
-		return errors.New(fmt.Sprintf("%s: command not found", name))
+		errMsg := fmt.Sprintf("%s: command not found\n", name)
+		io.WriteString(ctxCmd.Stderr, errMsg)
+		return errors.New(errMsg)
 	}
 }
 
