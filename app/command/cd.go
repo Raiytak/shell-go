@@ -1,6 +1,8 @@
 package command
 
 import (
+	"fmt"
+	"io"
 	"os"
 	"path"
 	"strings"
@@ -24,6 +26,7 @@ func (c Cd) Run(ctx *context.Shell, _ *context.Command, args []string) error {
 	}
 	_, err := os.Stat(target)
 	if err != nil {
+		io.WriteString(ctx.Stderr, fmt.Sprintf("cd: %s: No such file or directory\n", target))
 		return err
 	}
 	ctx.Dir = target
