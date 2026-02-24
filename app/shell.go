@@ -30,6 +30,9 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		panic("error gathering the working directory")
 	}
 	histFile := os.Getenv("HISTFILE")
+	if histFile == "" {
+		histFile = ".bash_history"
+	}
 	history, err := history.Initialize(histFile)
 	if err != nil {
 		panic(err)
