@@ -1,9 +1,9 @@
 package command
 
 import (
-	"errors"
 	"slices"
-	"strings"
+
+	"github.com/google/shlex"
 )
 
 var delimiter = []byte{'"', '\''}
@@ -18,41 +18,9 @@ func Tokenize(line string) (name string, fields []string, err error) {
 	return name, fields[1:], err
 }
 
-func extractFields(line string) (fields []string, err error) {
-	var token string
-	var d byte
-
-	if len(line) == 0 {
-		return fields, nil
-	}
-
-	cleanedLine := strings.Join(strings.Fields(line), " ")
-	for i := 0; i < len(cleanedLine); i++ {
-		b := cleanedLine[i]
-		switch {
-		case (b == d || (b == ' ' && d == 0)):
-			if token != "" {
-				fields = append(fields, token)
-				d = 0
-				token = ""
-			} else {
-				token = ""
-			}
-		case (d == 0 && isDelimiter(b)):
-			d = b
-		case i == len(cleanedLine)-1:
-			if b != '\n' {
-				token += string(b)
-			}
-			fields = append(fields, token)
-		default:
-			token += string(b)
-		}
-	}
-	if d != 0 {
-		return []string{}, errors.New("unclosed quote\n")
-	}
-	return fields, nil
+func extractFields(line string) (args []string, err error) {
+	args, err = shlex.Split(line)
+	return args, err
 }
 
 func isDelimiter(c byte) bool {
