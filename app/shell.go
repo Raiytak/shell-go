@@ -20,7 +20,15 @@ type Shell struct {
 }
 
 func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
-	reader, err := readline.New("$ ")
+	autoCompleter := readline.NewPrefixCompleter(
+		readline.PcItem("echo"),
+		readline.PcItem("exit"),
+	)
+	reader, err := readline.NewEx(&readline.Config{
+		Prompt:          "$ ",
+		AutoComplete:    autoCompleter,
+		InterruptPrompt: "^C",
+	})
 	if err != nil {
 		panic(err)
 	}
