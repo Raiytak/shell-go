@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -32,7 +31,6 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 	}
 	os.Setenv("HISTFILE", "test_history")
 	histFile := os.Getenv("HISTFILE")
-	fmt.Print(histFile)
 	history, err := history.Initialize(histFile)
 	if err != nil {
 		panic(err)
