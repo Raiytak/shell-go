@@ -155,6 +155,6 @@ func CloseFiles(files []*os.File) error {
 }
 
 func SaveHistory(c *context.Shell) error {
-	_, err := history.Persist(c.History, "-w", c.HistFile)
+	_, err := history.Persist(c.History, "-a", c.HistFile)
 	return err
 }
