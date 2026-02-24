@@ -51,7 +51,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 }
 
 func (s *Shell) Run() {
-	defer s.Context.History.
+	defer SaveHistory(&s.Context)
 	for {
 		line, err := s.Reader.Readline()
 		if err != nil {
@@ -154,7 +154,7 @@ func CloseFiles(files []*os.File) error {
 	return nil
 }
 
-func SaveHistory(c *context.Shell) err {
-	_, err := history.Persist(c.History, "-w", s.HistFile)
+func SaveHistory(c *context.Shell) error {
+	_, err := history.Persist(c.History, "-w", c.HistFile)
 	return err
 }
