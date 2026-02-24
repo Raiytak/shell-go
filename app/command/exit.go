@@ -8,7 +8,11 @@ import (
 
 type Exit struct{}
 
-func (c *Exit) Run(_ *context.Shell, _ *context.Command, _ []string) error {
+func (c *Exit) Run(ctx *context.Shell, _ *context.Command, _ []string) error {
+	err := ctx.SaveHistory()
+	if err != nil {
+		return err
+	}
 	os.Exit(0)
 	return nil
 }
