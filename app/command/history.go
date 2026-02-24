@@ -29,7 +29,7 @@ func (c History) Run(ctxSh *context.Shell, ctxCmd *context.Command, args []strin
 		filename := args[1]
 		updatedHistory, err := history.Persist(ctxSh.History, action, filename)
 		if action == "-r" {
-			updatedHistory = slices.Insert(updatedHistory, 0, strings.Join(args, " "))
+			updatedHistory = slices.Insert(updatedHistory, 0, "history "+strings.Join(args, " "))
 		}
 		ctxSh.History = updatedHistory
 		if err != nil {
