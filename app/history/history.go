@@ -88,7 +88,10 @@ func Display(history []string, start int) (output string, err error) {
 		return output, errors.New("no such event")
 	}
 	for i := start; i < len(history); i++ {
-		output += fmt.Sprintf("    %d  %s\n", i+1, history[i])
+		output += fmt.Sprintf("    %d  %s", i+1, history[i])
+		if i < len(history)-1 {
+			output += "\n"
+		}
 	}
 	return output, err
 }
