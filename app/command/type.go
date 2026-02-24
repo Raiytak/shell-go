@@ -32,5 +32,7 @@ func (c *Type) Run(ctxSh *context.Shell, ctxCmd *context.Command, args []string)
 	}
 
 	// Command not found
-	return errors.New(fmt.Sprintf("%s: not found\n", name))
+	errMsg := fmt.Sprintf("%s: not found\n", name)
+	io.WriteString(ctxCmd.Stderr, errMsg)
+	return errors.New(errMsg)
 }
