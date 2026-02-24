@@ -80,5 +80,5 @@ func RedirectedStdout(args []string) bool {
 }
 
 func RedirectedStderr(args []string) bool {
-	return slices.Contains(args, "2>") || slices.Contains(args, ">>")
+	return slices.Contains(args, "2>")
 }
