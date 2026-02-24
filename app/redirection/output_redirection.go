@@ -76,7 +76,7 @@ func isOutputRedirection(arg string) bool {
 }
 
 func RedirectedStdout(args []string) bool {
-	return slices.Contains(args, ">") || slices.Contains(args, "1>") || slices.Contains(args, "1>>")
+	return slices.Contains(args, ">") || slices.Contains(args, "1>") || slices.Contains(args, "1>>") || slices.Contains(args, ">>")
 }
 
 func RedirectedStderr(args []string) bool {
