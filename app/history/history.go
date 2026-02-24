@@ -97,7 +97,11 @@ func Display(history []string, start int) (output string, err error) {
 }
 
 func Append(history []string, name string, args []string) []string {
-	return append(history, name+" "+strings.Join(args, " "))
+	arguments := ""
+	if len(args) > 0 {
+		arguments = " " + strings.Join(args, " ")
+	}
+	return append(history, name+arguments)
 }
 
 func reset(history []string) {
