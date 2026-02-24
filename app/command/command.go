@@ -47,7 +47,7 @@ func Run(name string, args []string, ctxSh *context.Shell, ctxCmd *context.Comma
 func runExecutable(cmd *exec.Cmd, ctx *context.Command) error {
 	cmd.Stdin = ctx.Stdin
 	cmd.Stdout = ctx.Stdout
-	//cmd.Stderr = ctx.Stderr
+	cmd.Stderr = ctx.Stderr
 	return cmd.Run()
 }
 
