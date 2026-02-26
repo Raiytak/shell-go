@@ -10,7 +10,7 @@ var delimiter = []byte{'"', '\''}
 
 func Tokenize(line string) (name string, fields []string, err error) {
 	fields, err = extractFields(line)
-	if err != nil || len(fields) == 0 {
+	if err != nil {
 		return name, fields, err
 	}
 

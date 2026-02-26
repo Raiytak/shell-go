@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -20,14 +21,10 @@ type Shell struct {
 }
 
 func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
-	autoCompleter := readline.NewPrefixCompleter(
-		readline.PcItem("echo"),
-		readline.PcItem("exit"),
-	)
 	reader, err := readline.NewEx(&readline.Config{
-		Prompt:          "$ ",
-		AutoComplete:    autoCompleter,
-		InterruptPrompt: "^C",
+		Prompt:       "$ ",
+		AutoComplete: &completer{},
+		//InterruptPrompt: "^C",
 	})
 	if err != nil {
 		panic(err)
@@ -67,10 +64,6 @@ func (s *Shell) Run() {
 			io.WriteString(s.Context.Stderr, err.Error()+"\n")
 			os.Exit(1)
 		}
-		if line == "" {
-			continue
-		}
-
 		cmds := redirection.Subcommands(line)
 		runPipeline(cmds, &s.Context)
 	}
@@ -158,4 +151,29 @@ func CloseFiles(files []*os.File) error {
 		}
 	}
 	return nil
+}
+
+type completer struct{}
+
+func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
+	prefix := string(line[:pos])
+	var matches []string
+
+	for builtin, _ := range command.Builtin {
+		if strings.HasPrefix(builtin, prefix) {
+			matches = append(matches, builtin)
+		}
+	}
+
+	// Notify no matches - Bell Character
+	if len(matches) == 0 {
+		fmt.Printf("%c", 0x07)
+		return nil, 0
+	}
+
+	var result [][]rune
+	for _, m := range matches {
+		result = append(result, []rune(m[pos:]))
+	}
+	return result, len(prefix)
 }
