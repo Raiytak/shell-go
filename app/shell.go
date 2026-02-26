@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"slices"
+	"sort"
 	"strings"
 	"sync"
 
@@ -161,6 +162,9 @@ type completer struct {
 }
 
 func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
+	// Bell Character
+	fmt.Printf("%c", 0x07)
+
 	input := string(line[:pos])
 	lastSpace := strings.LastIndex(input, " ") + 1
 	prefix := input[lastSpace:]
@@ -186,13 +190,12 @@ func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
 		}
 	}
 
-	// Notify no matches - Bell Character
-	fmt.Printf("%c", 0x07)
 	if len(matches) == 0 {
 		return nil, 0
 	}
 
 	var result [][]rune
+	sort.Strings(matches)
 	for _, m := range matches {
 		result = append(result, []rune(m[len(prefix):]+" "))
 	}
