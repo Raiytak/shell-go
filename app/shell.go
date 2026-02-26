@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 	"sync"
 
@@ -21,15 +22,6 @@ type Shell struct {
 }
 
 func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
-	reader, err := readline.NewEx(&readline.Config{
-		Prompt:       "$ ",
-		AutoComplete: &completer{},
-		//InterruptPrompt: "^C",
-	})
-	if err != nil {
-		panic(err)
-	}
-
 	dir, err := os.Getwd()
 	if err != nil {
 		panic("error gathering the working directory")
@@ -43,10 +35,21 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 		panic(err)
 	}
 
+	pathList := strings.Split(os.Getenv("PATH"), string(os.PathListSeparator))
+
+	reader, err := readline.NewEx(&readline.Config{
+		Prompt:       "$ ",
+		AutoComplete: &completer{pathList: &pathList},
+		//InterruptPrompt: "^C",
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	return &Shell{
 		Context: context.Shell{
 			Dir:      dir,
-			PathList: strings.Split(os.Getenv("PATH"), string(os.PathListSeparator)),
+			PathList: pathList,
 			History:  history,
 			HistFile: histFile,
 			Stdin:    stdin,
@@ -153,7 +156,9 @@ func CloseFiles(files []*os.File) error {
 	return nil
 }
 
-type completer struct{}
+type completer struct {
+	pathList []string
+}
 
 func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	prefix := string(line[:pos])
@@ -162,6 +167,20 @@ func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	for builtin, _ := range command.Builtin {
 		if strings.HasPrefix(builtin, prefix) {
 			matches = append(matches, builtin)
+		}
+	}
+
+	var execs []string
+	for _, path := range c.pathList {
+		e, err := executables(path)
+		if err != nil {
+			panic(err)
+		}
+		execs = slices.Concat(execs, e)
+	}
+	for _, exec := range execs {
+		if strings.HasPrefix(exec, prefix) {
+			matches = append(matches, exec)
 		}
 	}
 
@@ -176,4 +195,27 @@ func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
 		result = append(result, []rune(m[pos:]+" "))
 	}
 	return result, len(prefix)
+}
+
+func executables(path string) ([]string, error) {
+	var execs []string
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return execs, err
+	}
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		info, err := entry.Info()
+		if err != nil {
+			continue
+		}
+
+		if info.Mode().Perm()&0111 == 1 {
+			execs = append(execs, entry.Name())
+		}
+	}
+	return execs, err
 }
