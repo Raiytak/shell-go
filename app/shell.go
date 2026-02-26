@@ -39,7 +39,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 
 	reader, err := readline.NewEx(&readline.Config{
 		Prompt:       "$ ",
-		AutoComplete: &completer{pathList: &pathList},
+		AutoComplete: &completer{pathList: pathList},
 		//InterruptPrompt: "^C",
 	})
 	if err != nil {
@@ -172,10 +172,10 @@ func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
 
 	var execs []string
 	for _, path := range c.pathList {
-		e, err := executables(path)
-		if err != nil {
-			panic(err)
-		}
+		e, _ := executables(path)
+		//if err != nil {
+		//	panic(err)
+		//}
 		execs = slices.Concat(execs, e)
 	}
 	for _, exec := range execs {
@@ -213,7 +213,7 @@ func executables(path string) ([]string, error) {
 			continue
 		}
 
-		if info.Mode().Perm()&0111 == 1 {
+		if info.Mode().Perm()&0111 != 0 {
 			execs = append(execs, entry.Name())
 		}
 	}
