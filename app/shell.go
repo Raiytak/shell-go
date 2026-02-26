@@ -187,8 +187,8 @@ func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
 	}
 
 	// Notify no matches - Bell Character
+	fmt.Printf("%c", 0x07)
 	if len(matches) == 0 {
-		fmt.Printf("%c", 0x07)
 		return nil, 0
 	}
 
