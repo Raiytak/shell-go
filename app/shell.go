@@ -173,7 +173,7 @@ func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
 
 	var result [][]rune
 	for _, m := range matches {
-		result = append(result, []rune(m[pos:]))
+		result = append(result, []rune(m[pos:]+" "))
 	}
 	return result, len(prefix)
 }
