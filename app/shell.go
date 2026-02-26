@@ -161,7 +161,9 @@ type completer struct {
 }
 
 func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
-	prefix := string(line[:pos])
+	input := string(line[:pos])
+	lastSpace := strings.LastIndex(input, " ") + 1
+	prefix := input[lastSpace:]
 	var matches []string
 
 	for builtin, _ := range command.Builtin {
@@ -192,7 +194,7 @@ func (c *completer) Do(line []rune, pos int) (newLine [][]rune, length int) {
 
 	var result [][]rune
 	for _, m := range matches {
-		result = append(result, []rune(m[pos:]+" "))
+		result = append(result, []rune(m[len(prefix):]+" "))
 	}
 	return result, len(prefix)
 }
