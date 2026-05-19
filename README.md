@@ -3,6 +3,9 @@ This project was developed as part of the CodeCrafters shell challenge to deepen
 
 ["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
 
+## Demo
+![Demo](docs/demo.gif)
+
 # Installation
 ```bash
 apt-get update && sudo apt-get -y install golang-go
