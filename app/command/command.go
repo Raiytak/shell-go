@@ -39,6 +39,7 @@ func Run(name string, args []string, ctxSh *context.Shell, ctxCmd *context.Comma
 	case found:
 		cmd := exec.Command(name, args...)
 		cmd.Path = path
+		cmd.Dir = ctxSh.Pwd
 		return runExecutable(cmd, ctxCmd)
 	default:
 		errMsg := fmt.Sprintf("%s: command not found\n", name)

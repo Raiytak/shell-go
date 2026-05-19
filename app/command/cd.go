@@ -22,14 +22,15 @@ func (c Cd) Run(ctx *context.Shell, _ *context.Command, args []string) error {
 	case input[0] == '/':
 		target = input
 	default:
-		target = path.Clean(path.Join(ctx.Dir, input))
+		target = path.Clean(path.Join(ctx.Pwd, input))
 	}
 	_, err := os.Stat(target)
 	if err != nil {
 		io.WriteString(ctx.Stderr, fmt.Sprintf("cd: %s: No such file or directory\n", target))
 		return err
 	}
-	ctx.Dir = target
+	ctx.Pwd = target
+	os.Setenv("PWD", target)
 	return err
 }
 

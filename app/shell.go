@@ -23,7 +23,7 @@ type Shell struct {
 }
 
 func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
-	dir, err := os.Getwd()
+	pwd, err := os.Getwd()
 	if err != nil {
 		panic("error gathering the working directory")
 	}
@@ -49,7 +49,7 @@ func NewShell(stdin io.Reader, stdout io.Writer, stderr io.Writer) *Shell {
 
 	return &Shell{
 		Context: context.Shell{
-			Dir:      dir,
+			Pwd:      pwd,
 			PathList: pathList,
 			History:  history,
 			HistFile: histFile,

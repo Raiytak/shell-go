@@ -7,7 +7,7 @@ import (
 )
 
 type Shell struct {
-	Dir      string
+	Pwd      string
 	PathList []string
 	History  []string
 	HistFile string

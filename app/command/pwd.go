@@ -13,6 +13,6 @@ func (c Pwd) Run(ctxSh *context.Shell, ctxCmd *context.Command, args []string) e
 	if len(args) != 0 {
 		return errors.New("too many arguments")
 	}
-	io.WriteString(ctxCmd.Stdout, ctxSh.Dir+"\n")
+	io.WriteString(ctxCmd.Stdout, ctxSh.Pwd+"\n")
 	return nil
 }
